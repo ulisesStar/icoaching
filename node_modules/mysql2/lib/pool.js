@@ -165,15 +165,21 @@ Pool.prototype.query = function(sql, values, cb) {
 Pool.prototype.execute = function(sql, values, cb) {
   var useNamedPlaceholders = this.config.connectionConfig.namedPlaceholders;
 
+  // TODO construct execute command first here and pass it to connection.execute
+  // so that polymorphic arguments logic is there in one place
+  if (typeof values == 'function') {
+    cb = values;
+    values = [];
+  }
+
   this.getConnection(function(err, conn) {
     if (err) {
       return cb(err);
     }
 
-    conn.config.namedPlaceholders = useNamedPlaceholders;
-    return conn.execute(sql, values, function() {
+    const executeCmd = conn.execute(sql, values, cb);
+    executeCmd.once('end', function() {
       conn.release();
-      cb.apply(this, arguments);
     });
   });
 };

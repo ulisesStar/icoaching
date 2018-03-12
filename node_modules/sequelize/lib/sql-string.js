@@ -1,16 +1,7 @@
 'use strict';
 
-/* jshint -W110 */
 const dataTypes = require('./data-types');
 const _ = require('lodash');
-
-function escapeId(val, forbidQualified) {
-  if (forbidQualified) {
-    return '`' + val.replace(/`/g, '``') + '`';
-  }
-  return '`' + val.replace(/`/g, '``').replace(/\./g, '`.`') + '`';
-}
-exports.escapeId = escapeId;
 
 function escape(val, timeZone, dialect, format) {
   let prependN = false;
@@ -83,6 +74,9 @@ exports.escape = escape;
 function format(sql, values, timeZone, dialect) {
   values = [].concat(values);
 
+  if (typeof sql !== 'string') {
+    throw new Error('Invalid SQL string provided: ' + sql);
+  }
   return sql.replace(/\?/g, match => {
     if (!values.length) {
       return match;

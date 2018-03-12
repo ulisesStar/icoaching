@@ -23,6 +23,17 @@ module.exports = BaseTypes => {
   BaseTypes.REAL.types.sqlite = ['REAL'];
   BaseTypes.DOUBLE.types.sqlite = ['DOUBLE PRECISION'];
   BaseTypes.GEOMETRY.types.sqlite = false;
+  BaseTypes.JSON.types.sqlite = ['JSON', 'JSONB'];
+
+  function JSONTYPE() {
+    if (!(this instanceof JSONTYPE)) return new JSONTYPE();
+    BaseTypes.JSON.apply(this, arguments);
+  }
+  inherits(JSONTYPE, BaseTypes.JSON);
+
+  JSONTYPE.parse = function parse(data) {
+    return JSON.parse(data);
+  };
 
   function DATE(length) {
     if (!(this instanceof DATE)) return new DATE(length);
@@ -37,6 +48,16 @@ module.exports = BaseTypes => {
     } else {
       return new Date(date); // We already have a timezone stored in the string
     }
+  };
+
+  function DATEONLY() {
+    if (!(this instanceof DATEONLY)) return new DATEONLY();
+    BaseTypes.DATEONLY.apply(this, arguments);
+  }
+  inherits(DATEONLY, BaseTypes.DATEONLY);
+
+  DATEONLY.parse = function parse(date) {
+    return date;
   };
 
   function STRING(length, binary) {
@@ -185,6 +206,7 @@ module.exports = BaseTypes => {
 
   const exports = {
     DATE,
+    DATEONLY,
     STRING,
     CHAR,
     NUMBER,
@@ -194,7 +216,8 @@ module.exports = BaseTypes => {
     INTEGER,
     BIGINT,
     TEXT,
-    ENUM
+    ENUM,
+    JSON: JSONTYPE
   };
 
   _.forIn(exports, (DataType, key) => {

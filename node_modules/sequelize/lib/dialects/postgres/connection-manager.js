@@ -45,8 +45,8 @@ class ConnectionManager extends AbstractConnectionManager {
     if (dataType.types.postgres.array_oids) {
       for (const oid of dataType.types.postgres.array_oids) {
         this.lib.types.setTypeParser(oid, value =>
-          this.lib.types.arrayParser.create(value, value =>
-            dataType.parse(value, oid, this.lib.types.getTypeParser)
+          this.lib.types.arrayParser.create(value, v =>
+            dataType.parse(v, oid, this.lib.types.getTypeParser)
           ).parse()
         );
       }
@@ -123,7 +123,7 @@ class ConnectionManager extends AbstractConnectionManager {
       });
 
       // Don't let a Postgres restart (or error) to take down the whole app
-      connection.on('error', (err) => {
+      connection.on('error', err => {
         debug(`connection error ${err.code}`);
         connection._invalid = true;
       });
@@ -145,10 +145,11 @@ class ConnectionManager extends AbstractConnectionManager {
       }
 
       // oids for hstore and geometry are dynamic - so select them at connection time
-      if (dataTypes.HSTORE.types.postgres.oids.length === 0) {
+      const supportedVersion = this.sequelize.options.databaseVersion !== 0 && semver.gte(this.sequelize.options.databaseVersion, '8.3.0');
+      if (dataTypes.HSTORE.types.postgres.oids.length === 0 && supportedVersion) {
         query += 'SELECT typname, oid, typarray FROM pg_type WHERE typtype = \'b\' AND typname IN (\'hstore\', \'geometry\', \'geography\')';
       }
-
+      
       return new Promise((resolve, reject) => {
         connection.query(query)
           .on('error', err => reject(err))
@@ -172,7 +173,7 @@ class ConnectionManager extends AbstractConnectionManager {
     });
   }
   disconnect(connection) {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       connection.end();
       resolve();
     });

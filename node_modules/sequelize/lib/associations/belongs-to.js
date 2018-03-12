@@ -9,22 +9,16 @@ const Association = require('./base');
 /**
  * One-to-one association
  *
- * In the API reference below, replace `Assocation` with the actual name of your association, e.g. for `User.belongsTo(Project)` the getter will be `user.getProject()`.
+ * In the API reference below, add the name of the association to the method, e.g. for `User.belongsTo(Project)` the getter will be `user.getProject()`.
  *
- * @mixin BelongsTo
+ * @see {@link Model.belongsTo}
  */
 class BelongsTo extends Association {
   constructor(source, target, options) {
-    super();
+    super(source, target, options);
 
     this.associationType = 'BelongsTo';
-    this.source = source;
-    this.target = target;
-    this.options = options;
-    this.scope = options.scope;
     this.isSingleAssociation = true;
-    this.isSelfAssociation = (this.source === this.target);
-    this.as = this.options.as;
     this.foreignKeyAttribute = {};
 
     if (this.as) {
@@ -72,36 +66,8 @@ class BelongsTo extends Association {
     const singular = Utils.uppercaseFirst(this.options.name.singular);
 
     this.accessors = {
-      /**
-       * Get the associated instance.
-       *
-       * @param {Object} [options]
-       * @param {String|Boolean} [options.scope] Apply a scope on the related model, or remove its default scope by passing false.
-       * @param {String} [options.schema] Apply a schema on the related model
-       * @see {Model#findOne} for a full explanation of options
-       * @return {Promise<Instance>}
-       * @method getAssociation
-       */
       get: 'get' + singular,
-      /**
-       * Set the associated model.
-       *
-       * @param {Instance|String|Number} [newAssociation] An persisted instance or the primary key of an instance to associate with this. Pass `null` or `undefined` to remove the association.
-       * @param {Object} [options] Options passed to `this.save`
-       * @param {Boolean} [options.save=true] Skip saving this after setting the foreign key if false.
-       * @return {Promise}
-       * @method setAssociation
-       */
       set: 'set' + singular,
-      /**
-       * Create a new instance of the associated model and associate it with this.
-       *
-       * @param {Object} [values]
-       * @param {Object} [options] Options passed to `target.create` and setAssociation.
-       * @see {Model#create}  for a full explanation of options
-       * @return {Promise}
-       * @method createAssociation
-       */
       create: 'create' + singular
     };
   }
@@ -134,16 +100,20 @@ class BelongsTo extends Association {
   }
 
   mixin(obj) {
-    const association = this;
+    const methods = ['get', 'set', 'create'];
 
-    obj[this.accessors.get] = function(options) {
-      return association.get(this, options);
-    };
-
-    association.injectSetter(obj);
-    association.injectCreator(obj);
+    Helpers.mixinMethods(this, obj, methods);
   }
 
+  /**
+   * Get the associated instance.
+   *
+   * @param {Object} [options]
+   * @param {String|Boolean} [options.scope] Apply a scope on the related model, or remove its default scope by passing false.
+   * @param {String} [options.schema] Apply a schema on the related model
+   * @see {@link Model.findOne} for a full explanation of options
+   * @return {Promise<Model>}
+   */
   get(instances, options) {
     const association = this;
     const where = {};
@@ -200,57 +170,63 @@ class BelongsTo extends Association {
         return result;
       });
     }
+
     return Target.findOne(options);
   }
 
-  // Add setAssociation method to the prototype of the model instance
-  injectSetter(instancePrototype) {
+  /**
+   * Set the associated model.
+   *
+   * @param {Model|String|Number} [newAssociation] An persisted instance or the primary key of an instance to associate with this. Pass `null` or `undefined` to remove the association.
+   * @param {Object} [options] Options passed to `this.save`
+   * @param {Boolean} [options.save=true] Skip saving this after setting the foreign key if false.
+   * @return {Promise}
+   */
+  set(sourceInstance, associatedInstance, options) {
     const association = this;
 
-    instancePrototype[this.accessors.set] = function(associatedInstance, options) {
-      options = options || {};
+    options = options || {};
 
-      let value = associatedInstance;
-      if (associatedInstance instanceof association.target) {
-        value = associatedInstance[association.targetKey];
-      }
+    let value = associatedInstance;
+    if (associatedInstance instanceof association.target) {
+      value = associatedInstance[association.targetKey];
+    }
 
-      this.set(association.foreignKey, value);
+    sourceInstance.set(association.foreignKey, value);
 
-      if (options.save === false) return;
+    if (options.save === false) return;
 
-      options = _.extend({
-        fields: [association.foreignKey],
-        allowNull: [association.foreignKey],
-        association: true
-      }, options);
+    options = _.extend({
+      fields: [association.foreignKey],
+      allowNull: [association.foreignKey],
+      association: true
+    }, options);
 
-
-      // passes the changed field to save, so only that field get updated.
-      return this.save(options);
-    };
-
-    return this;
+    // passes the changed field to save, so only that field get updated.
+    return sourceInstance.save(options);
   }
 
-  // Add createAssociation method to the prototype of the model instance
-  injectCreator(instancePrototype) {
+  /**
+   * Create a new instance of the associated model and associate it with this.
+   *
+   * @param {Object} [values]
+   * @param {Object} [options] Options passed to `target.create` and setAssociation.
+   * @see {@link Model#create}  for a full explanation of options
+   * @return {Promise}
+   */
+  create(sourceInstance, values, fieldsOrOptions) {
     const association = this;
 
-    instancePrototype[this.accessors.create] = function(values, fieldsOrOptions) {
-      const options = {};
+    const options = {};
 
-      if ((fieldsOrOptions || {}).transaction instanceof Transaction) {
-        options.transaction = fieldsOrOptions.transaction;
-      }
-      options.logging = (fieldsOrOptions || {}).logging;
+    if ((fieldsOrOptions || {}).transaction instanceof Transaction) {
+      options.transaction = fieldsOrOptions.transaction;
+    }
+    options.logging = (fieldsOrOptions || {}).logging;
 
-      return association.target.create(values, fieldsOrOptions).then(newAssociatedObject =>
-        this[association.accessors.set](newAssociatedObject, options)
-      );
-    };
-
-    return this;
+    return association.target.create(values, fieldsOrOptions).then(newAssociatedObject =>
+      sourceInstance[association.accessors.set](newAssociatedObject, options)
+    );
   }
 }
 

@@ -5,31 +5,41 @@ app.run(['$rootScope', '$state', '$stateParams', function ($rootScope, $state, $
 
 app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider, $stateProvider) {
 
+
+	function template(seccion, vista, url, params) {
+		let obj = {
+			url: url,
+			data: {
+				titulo: vista[0]
+			},
+			params: params,
+			views: {
+				'main': {
+					templateUrl: _(vista).union(['/' + seccion]).reverse().join('/'),
+					controller: vista[0] + 'Ctrl as ctrl'
+				}
+			},
+			resolve: {
+				loadMyCtrl: [
+					'$ocLazyLoad',
+					function($ocLazyLoad) {
+						return $ocLazyLoad.load([seccion + vista[0]]);
+					}
+				]
+			}
+		}
+		return obj
+	}
+
 	$urlRouterProvider.otherwise('/');
 	$stateProvider
 
-	.state('home', {
-		url: '/',
-		views: {
-			'main': {
-				templateUrl: '/admin/home'
-			}
-		}
-	})
-	.state('lista_trabajos', {
-		url: '/',
-		views: {
-			'main': {
-				templateUrl: '/admin/lista_trabajos'
-			}
-		}
-	})
-	.state('trabajo', {
-		url: '/',
-		views: {
-			'main': {
-				templateUrl: '/admin/agregar_trabajo'
-			}
-		}
-	})
+	.state('home', template('admin', ['home'], '/'))
+	.state('servicios', template('admin', ['servicios'], '/servicios'))
+	.state('servicio', template('admin', ['servicio'], '/servicio/:id'))
+	.state('modalidades', template('admin', ['modalidades'], '/modalidades'))
+	.state('modalidad', template('admin', ['modalidad'], '/modalidad/:id'))
+	.state('evento', template('admin', ['evento'], '/evento/:id'))
+
+
 }]);

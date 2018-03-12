@@ -1,18 +1,116 @@
-.objeto(tweeninit)
-.animacion(layout="row" layout-align="center center" botones)
-    .texto-container
-        .texto
-            #texto1
-                h1 La primera impresión se da a los 4 segundos
-        .texto
-            #texto2
-                h1 En una página de internet es igual
-        .texto
-            #texto3
-                h1 Nuestas páginas web hechas a medida de cada cliente
-        .texto
-            #texto4
-                h1 y estan optimizadas para atraer clientes que buscan lo que ofreces
-        .texto
-            #texto5
-                h1 Como tu que buscabas una página de internet
+.home
+	section.principal
+		.section-content
+			.contenido
+				.slogan-container
+					p llegar a la meta es
+					h3 MÁS FÁCIL CON ICOACH
+				.fecha-container
+					p Proximo curso
+					strong 14 Abril
+					span(countdown='' date='2017-11-15 15:27:35')
+			.evento-container
+				.precio
+					strong $2,000
+					p Precio inicial
+				.evento
+					.izquierda
+					.derecha
+				.precio
+					strong $2,000
+					p Precio inicial
+			.botones
+				md-button.md-raised Reserva
+				span Aparta tu lugar y sin compromiso
+			
+	section.principal(layout="row")
+		.main-slider(flex="60")
+			//- .item.image
+			//- 	span.loading Loading...
+			//- 	figure
+			//- 		.slide-image.slide-media(style="background-image:url('img/510c54bd89e428e.jpg');")
+			//- 			img.image-entity(data-lazy='img/510c54bd89e428e.jpg')
+			//- 		//- figcaption.caption Static Image
+			//- .item.vimeo(data-video-start='4')
+			//- 	iframe.embed-player.slide-media(src='https://player.vimeo.com/video/217885864?api=1&byline=0&portrait=0&title=0&background=1&mute=1&loop=1&autoplay=0&id=217885864', width='980', height='520', frameborder='0', webkitallowfullscreen='', mozallowfullscreen='', allowfullscreen='')
+			//- 	//-  p.caption Vimeo
+			//- .item.image
+			//- 	figure
+			//- 		.slide-image.slide-media(style="background-image:url('https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLNXBIcEdOUFVIWmM');")
+			//- 			img.image-entity(data-lazy='https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLNXBIcEdOUFVIWmM')
+			//- 		//-  figcaption.caption Static Image
+			//- .item.youtube
+			//- 	iframe.embed-player.slide-media(width='980', height='520', src='https://www.youtube.com/embed/tdwbYGe8pv8?enablejsapi=1&controls=0&fs=0&iv_load_policy=3&rel=0&showinfo=0&loop=1&playlist=tdwbYGe8pv8&start=102', frameborder='0', allowfullscreen='')
+			//- 	//-  p.caption YouTube
+			//- .item.image
+			//- 	figure
+			//- 		.slide-image.slide-media(style="background-image:url('https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLSlBkWDBsWXJNazQ');")
+			//- 			img.image-entity(data-lazy='https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLSlBkWDBsWXJNazQ')
+			//- 		//-  figcaption.caption Static Image
+			.item.video
+				video.slide-video.slide-media(loop='', muted='', preload='metadata', poster='https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLSXZCakVGZWhOV00')
+					source(src='https://player.vimeo.com/external/138504815.sd.mp4?s=8a71ff38f08ec81efe50d35915afd426765a7526&profile_id=112', type='video/mp4')
+				//-  p.caption HTML 5 Video
+		.fondo(flex="40")
+	section.intro-container(layout="row" layout-align="center start")
+		.intro(flex="80")
+			//- .imagen
+			//- 	md-icon(md-svg-icon="img/arrow.svg")
+			.descripcion
+				span Icoach nace por el interés de crear, forjar y formar nuevos líderes y empresarios que implementen nuevas estrategias y herramientas para establecer negocios sólidos y consolidados. 
+				span Icoach está conformado por especialistas en las distas áreas de consultoría como; coaching, programación neurolingüística, finanzas, recursos humanos, branding personal, marketing y comunicación.
+	section.modalidades(layout="row" layout-align="center center")
+		.modalidades-content(flex="80" layout="row" layout-align="space-around start")
+			md-card.modalidad(ng-repeat="modalidad in ctrl.modalidades" flex ng-init="hover = false"  ng-mouseover="hover = true" ng-mouseleave="hover = false"  ng-class="hover ? 'conHover' : 'sinHover'" ui-sref="servicios({IdModalidad: modalidad.id})")
+				.titulo-container
+					.imagen(md-whiteframe="3")
+						img(src="img/{{$index}}.png")
+					.titulo {{modalidad.nombre}}
+				.descripcion
+					p(ng-bind-html="modalidad.descripcion")
+		//- .botones-container(layout="row" layout-align="center center")
+		//- 	.botones(flex="80")
+		//- 		md-button.md-raised(ng-repeat="area in ctrl.areas" ng-click="ctrl.mostrarArea($index)") {{area.nombre}}
+	section.leadership
+		.content
+			.descripcion-content
+				.descripcion(ng-bind-html="ctrl.areas[0].descripcion")
+				md-button(ui-sref="servicios({IdArea: 1})") Más información
+			.imagen(style="background-image: url('img/leadership.png')")
+				.titulo {{ctrl.areas[0].nombre}}
+	section.bilateral
+		.content
+			.imagen(style="background-image: url('img/bilateral.png')")
+				.titulo {{ctrl.areas[1].nombre}}
+			.descripcion-content
+				.descripcion(ng-bind-html="ctrl.areas[1].descripcion")
+				md-button(ui-sref="servicios({IdArea: 2})") Más información
+	section.formulario(layout="row" layout-align="center center")
+		.formulario-content(flex="60")
+			h2 Solicita una sesión de coaching
+			h4 Sin costo
+			form(layout="column" ng-submit="crearProspecto()" )
+				div(layout="row")
+					md-input-container(flex)
+						label Nombre
+						input
+					md-input-container(flex)
+						label Apellido
+						input
+				div(layout="row")
+					md-input-container(flex)
+						label Compañia
+						input
+					md-input-container(flex)
+						label Tefono
+						input
+					md-input-container(flex)
+						label Correo
+						input
+				div(layout="row" layout-align="start center")
+					md-button(type="submit") Enviar formulario
+						md-icon keyboard_arrow_right
+						
+				
+				
+				

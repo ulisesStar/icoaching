@@ -29,7 +29,7 @@ class ModelManager {
 
     const model = this.models.filter(model => model[options.attribute] === against);
 
-    return !!model ? model[0] : null;
+    return model ? model[0] : null;
   }
 
   get all() {
@@ -40,6 +40,7 @@ class ModelManager {
    * Iterate over Models in an order suitable for e.g. creating tables. Will
    * take foreign key constraints into account so that dependencies are visited
    * before dependents.
+   * @private
    */
   forEachModel(iterator, options) {
     const models = {};

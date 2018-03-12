@@ -1,0 +1,22 @@
+md-dialog
+	md-toolbar
+		.md-toolbar-tools
+			h4 Crear evento
+	.md-padding(layout="column")
+		md-input-container(flex)
+			label Nombre del evento
+			input(ng-model="evento.nombre")
+		div(layout="row")
+			md-input-container(flex)
+				md-datepicker(ng-model="evento.fechafinal" md-placeholder="Fecha inicial")
+			md-input-container(flex)
+				label Precio inicial
+				input(ng-model="evento.precioinicial")
+		div(layout="row")
+			md-input-container(flex)
+				md-datepicker(ng-model="evento.fechainicial" md-placeholder="Fecha Final")
+			md-input-container(flex)
+				label Precio final
+				input(ng-model="evento.preciofinal")
+		md-button(ng-click="aplicar()")
+			md-icon done

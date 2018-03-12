@@ -3,6 +3,10 @@ extends ../index
 block moreHead
 	script(type="text/javascript" src="js/admin/admin.states.js")
 	script(type="text/javascript" src="js/admin/admin.controller.js")
+	link(type="text/css" rel="stylesheet", href="stylus/admin.css")
+	
+	
+
 
 block content
 
@@ -17,17 +21,15 @@ block content
 					md-button(href="/")
 						md-icon.material-icons exit_to_app
 		div(layout="row")
-			md-sidenav.md-sidenav-left(md-component-id="left" md-disable-backdrop md-whiteframe="4")
+			md-sidenav.md-sidenav-left(md-component-id="left" md-whiteframe="4")
 				md-toolbar
 					.md-toolbar-tools
 						md-button(ng-click="toggleLeft()") cerrar
 				md-list
-					md-list-item(ui-sref="home" ng-click="toggleLeft()")
-						md-icon home
+					md-list-item(ui-sref="{{seccion.state}}" ng-click="toggleLeft()" ng-repeat="seccion in secciones")
+						md-icon(style="margin:0 10px; height: 20px;") {{seccion.icon}}
 						.md-list-item-text
-							h4 home
-					md-list-item(ui-sref="contactos" ng-click="toggleLeft()")
-						md-icon person
-						.md-list-item-text
-							h4 Lista de contactos
+							h4 {{seccion.nombre}}
 			main(ui-view="main" class="page" flex)
+		footer(layout="row" layout-align="space-around center")
+			include partials/footer

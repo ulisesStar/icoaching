@@ -1,0 +1,60 @@
+.croppie-container {
+  max-height: 240px;
+}
+.logo {
+  width: 30%;
+  margin: 0 auto;
+}
+.logo span {
+  color: rgba(0,0,0,0.87) !important;
+}
+.logo form {
+  width: 100%;
+}
+.servicio .area {
+  border-radius: 10px;
+}
+.servicio .area h4 {
+  color: #fff;
+}
+.servicio .area input,
+.servicio .area .ta-bind {
+  background-color: #fff;
+  border-radius: 10px;
+}
+.servicio .area md-icon,
+.servicio .area label,
+.servicio .area .md-button span {
+  color: #fff !important;
+}
+.evento section.imagenes form {
+  margin: 0px;
+  height: 100%;
+  width: 100%;
+}
+.evento section.imagenes form .dropify-wrapper,
+.evento section.imagenes form .croppie-container {
+  padding: 0px;
+  border: none;
+  height: calc(100% - 36px);
+  max-height: none;
+}
+.evento section.imagenes form .md-button {
+  margin: 0px;
+  border-radius: 0px;
+}
+.evento section.imagenes .imagen img {
+  width: 100%;
+  height: auto;
+}
+md-sidenav md-icon {
+  color: #41b878;
+}
+footer {
+  height: 100px;
+  background-color: #3c3c3c;
+}
+footer md-icon {
+  height: 50px;
+  width: auto;
+}

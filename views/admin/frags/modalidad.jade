@@ -1,0 +1,19 @@
+.modalidad
+	md-card
+		.modalidad-content
+			div(layout="row" layout-align="space-between center")
+				.md-padding
+					h4 Modalidad
+				.opciones
+					md-button(ng-click="ctrl.modalidad.guardar()")
+						md-icon save
+					md-button(ng-click="editar = !editar")
+						md-icon edit
+			.md-padding
+				form(ng-init="!editar")
+					div(layout="row")
+						md-switch(ng-model="ctrl.modalidad.status" aria-label="status" ng-true-value="1" ng-false-value="0")
+						md-input-container(flex)
+							label nombre
+							input(ng-model="ctrl.modalidad.nombre" ng-disabled="!editar")
+					text-angular(ng-model="ctrl.modalidad.descripcion")

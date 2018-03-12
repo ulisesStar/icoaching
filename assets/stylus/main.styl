@@ -1,0 +1,509 @@
+verde = #41B878
+verdeClaro = #ABE774
+verdeObscuro = #22603f
+
+gris = #6D6E70
+grisObscuro = #515151
+
+
+rosa = #7f1e57
+rosaObscuro = #87205c
+
+mobile = "(max-width: 600px)"
+compu = "(min-width: 600px)"
+
+@font-face
+	font-family Poppins
+	font-weight 800
+	src url('../fonts/Poppins-Bold.ttf')
+
+transition(duracion, delay)
+	-webkit-transition all duracion cubic-bezier(0.445, 0.050, 0.550, 0.950)
+	transition all duracion cubic-bezier(0.445, 0.050, 0.550, 0.950)
+	-webkit-transition-delay delay ease-in-out
+	transition-delay delay ease-in-out
+
+animation(animation, duration = 1s)
+	-webkit-animation animation duration cubic-bezier(0.445, 0.050, 0.550, 0.950)
+	animation animation duration cubic-bezier(0.445, 0.050, 0.550, 0.950)
+	-webkit-transition all duration ease-in-out
+	-moz-transition all duration ease-in-out
+	-o-transition all duration ease-in-out
+	transition all duration ease-in-out
+
+
+header
+	position fixed
+	z-index 1000
+	background-color rgba(0,0,0 .2)
+	width 100vw
+	md-icon
+		height 49px
+		width 100px
+		margin 0px
+	md-nav-bar
+		nav
+			.md-nav-item
+				span
+					color white
+			&.md-accent
+				color verde
+		md-nav-ink-bar
+			color verde
+			background verde
+main
+	position relative
+
+.home
+	section
+		&.principal
+			height 100vh
+			width 100vw
+			&:first-child
+				display flex
+				justify-content center
+				align-items center
+				z-index 99
+				position absolute
+			.section-content
+				width 80vw
+				.contenido
+					display flex
+					flex-direction row
+					&>div
+
+						color white
+						display flex
+						flex-direction column
+						align-items center
+						p
+							margin 0px
+					.slogan-container
+						flex 2
+						align-items start
+						p
+							font-family helvetica
+							font-size 66px
+							color verdeClaro
+							text-transform uppercase
+							letter-spacing -7px
+						h3
+							font-family helvetica
+							font-weight bold
+							font-size: 88px
+							margin 0px
+							line-height 72px
+							letter-spacing -10px
+					.fecha-container
+						flex 1
+						display flex
+						justify-content center
+						p
+							margin 0px
+						strong
+							font-size 60px
+							line-height 1
+						span
+							font-size 30px
+							letter-spacing -2px
+							text-transform uppercase
+
+				.evento-container
+					margin 40px 0
+					flex-direction row
+					display flex
+					.precio
+						margin 0 20px
+						color white
+						strong
+							font-size 25px
+							text-align center
+						p
+							margin 0px
+							font-size 11px
+							text-align center
+					.evento
+						flex 1
+						background-color rgba(255, 255, 255, .5)
+						border-radius 50px
+						height 40px
+						padding 5px
+						display flex
+						justify-content center
+						flex-direction row
+						.izquierda
+							border-radius 50px 0 0 50px
+							background-color white
+							flex-grow 2
+						.derecha
+							border-radius 0 50px 50px 0
+							background-color rgba(255, 255, 255, .5)
+							flex-grow 1
+				.botones
+					display flex
+					justify-content center
+					align-items center
+					flex-direction column
+					.md-button
+						background-color verdeClaro
+						height 60px
+						width 300px
+						margin 0px
+					&> span
+						background-color white
+						font-size 11px
+						padding 10px
+						border-radius 0 0 5px 5px
+
+			.fondo
+				background-color verde
+				&:before
+					height 0px
+					width 0px
+					// background-color blue
+					border-right 0px solid transparent
+					border-top 0px solid transparent
+					border-left 200px solid transparent
+					border-bottom 100vh solid verde
+					content ''
+					left -200px
+					display block
+					position relative
+					z-index 1
+		&.intro-container
+			background-color verde
+			height 300px
+			.intro
+				display flex
+				.imagen
+					position relative
+					flex 1
+					md-icon
+						height 300px
+						width auto
+						position absolute
+						right 0px
+				.descripcion
+					height 200px
+					flex 1
+					display flex
+					flex-direction column
+					justify-content center
+					span
+						margin 10px 0
+						color white
+		&.modalidades
+			height 300px
+			.modalidades-content
+				margin-top -200px
+				.modalidad
+					padding 10px
+					cursor pointer
+					max-width 400px
+					&.conHover
+						transform scale(.90)
+						transition(200ms, 0)
+					.titulo-container
+						display flex
+						align-items center
+						.imagen
+							height 30px
+							width 30px
+							background-color white
+							padding 5px
+							border-radius 50px
+							display flex
+							justify-content center
+							align-items center
+							margin 0 10px
+							img
+								height 20px
+								width auto
+						.titulo
+							font-size 25px
+							letter-spacing -1px
+							font-weight bold
+							color verde
+					.descripcion
+						padding 20px
+						text-align justify
+
+		&.leadership, &.bilateral
+			height 80vh
+			overflow hidden
+			position relative
+			.content
+				height 100%
+				display flex
+				.imagen
+					flex 1
+					display flex
+					justify-content center
+					align-items center
+					background-repeat no-repeat
+					.titulo
+						font-family Poppins
+						font-weight 800
+						color white
+						font-size 8vw
+						line-height 8vw
+				.descripcion-content
+					position relative
+					flex 1
+					display flex
+					justify-content center
+					align-items center
+					flex-direction column
+					.descripcion
+						max-width 70%
+						color white
+					.md-button
+						background-color inherit
+						border 1px solid white
+						border-radius 60px
+						height 60px
+						padding 0 30px
+						span
+							color white
+							line-height 60px
+		&.leadership
+			// background-color verdeObscuro
+			.imagen
+				background-position left bottom
+			.content
+				background-color verde
+		&.bilateral
+			// background-color rosaObscuro
+			.imagen
+				background-position right bottom
+			.content
+				background-color rosa
+
+		&.formulario
+			height 100vh
+			h2
+				font-family Poppins
+				font-size 5vw
+				line-height 5vw
+				margin 0px
+			h4
+				font-family Poppins
+				font-size 3vw
+				line-height 3vw
+				color verde
+				margin 0px
+			.formulario-content
+				form
+					width 100%
+					.md-button
+						background-color verde
+						border-radius 50px
+						padding 0 30px
+						height 60px
+						margin 0px
+						span
+							color white
+						md-icon
+							color white
+
+
+.servicios
+	margin-top 100px
+	.servicios-content
+		min-height 100vh
+		.filtros
+			margin 30px 0
+			height 40px
+			display flex
+			justify-content space-around
+			flex-direction row
+			.clear
+				margin 0px
+				background gris
+				min-width 40px
+				border-radius 40px
+				md-icon
+					color white
+			&>md-nav-bar
+				background-color gris
+				border-radius 50px
+				.md-nav-bar
+					height 40px
+					border inherit
+					nav
+						position relative
+						z-index 2
+					.md-nav-item
+						font-size 11px
+						margin 0px 10px
+						border-radius 0px
+						&:first-child
+							margin-left 0px
+							border-radius 50px 0 0 50px
+						&:last-child
+							border-radius 0 50px 50px 0
+							margin-right 0px
+						.md-button
+							margin 0px
+							border-radius 50px
+							padding 8px
+							span
+								font-size 11px
+								color white
+							&.md-unselected
+								span
+									color white
+
+					md-nav-ink-bar
+						height 100%
+						z-index 1
+						background verde
+						border-radius 50px
+						transition(300ms, 0)
+
+
+		md-grid-list
+			md-grid-tile
+				&.ng-enter
+					animation(fadeInUp)
+				&.ng-leave
+					animation(fadeOutDown)
+				md-card
+					slider
+						height calc(100% - 55px)
+						display flex
+						justify-content center
+						align-items center
+						.slider-container
+							width 100%
+							height 100%
+							position relative
+							.slider
+								position initial
+								.slick-dots
+									padding 0px
+									bottom 0px
+									li button:before
+										content none
+								.slick-slide
+									height 100%
+									width 100%
+									imagen, .imagen
+										width 100%
+										height 100%
+										background-size cover
+										background-position center
+
+
+					md-card-title
+						padding 10px
+						font-size 15px
+						line-height 15px
+
+.servicio
+	.imagenes
+		.titulo
+			width 100%
+			position absolute
+			height 80vh
+			display flex
+			z-index 2
+			color white
+			justify-content center
+			align-items center
+			h2
+				font-family Poppins
+				font-weight 800
+				color white
+				font-size 3vw
+				line-height 3vw
+		#central
+			height 80vh
+
+			imagen
+				height 80vh
+		#slider
+			height 20vh
+			.slick-slide
+				height calc(20vh - 30px)
+		.imagen
+			height 100%
+			width 100%
+			background-position center
+			background-size cover
+			background-repeat no-repeat
+		.slick-dots
+			position relative
+			height 30px
+			bottom inherit
+			padding 0px
+			margin 0px
+			li
+				height 30px
+				button
+					margin 6px 2px
+					&:before
+						content none
+	.relaciones
+		display flex
+		margin 5vh 0
+		flex-direction row
+		justify-content space-around
+		.md-button
+			margin 0px
+			border-radius 40px
+			height 40px
+			background-color verde
+			padding 0 20px
+			color white
+	.servicio-content
+		margin 30px
+		display flex
+		&>div
+			flex 1
+			min-height 60vh
+			display flex
+			justify-content center
+			align-items center
+			&>div
+				padding 10vw
+		form
+			min-width 60%
+			md-input-container
+				margin 10px 0
+				.md-errors-spacer
+					min-height 0px
+				input
+					background-color white
+					height 45px
+					border-radius 5px
+			.md-button
+				background-color rgba(255,255, 255, 0.4)
+				margin 20px 0px
+				height 50px
+	.programa
+		min-height 60vh
+
+footer
+	margin-top 20px
+	background-color gris
+	.footer-content
+		margin 20px 0
+		h4
+			color white
+		.direccion
+			md-icon
+				margin 20px
+				color white
+			p
+				color white
+		.mapa
+			ui-gmap-google-map
+				height 30%
+				width 300px
+				.angular-google-map
+					width 100%
+					height 300px
+					.angular-google-map-container
+						height 300px
+						width 100%

@@ -8,31 +8,25 @@ const Association = require('./base');
 /**
  * One-to-many association
  *
- * In the API reference below, replace `Association(s)` with the actual name of your association, e.g. for `User.hasMany(Project)` the getter will be `user.getProjects()`.
+ * In the API reference below, add the name of the association to the method, e.g. for `User.hasMany(Project)` the getter will be `user.getProjects()`.
+ * If the association is aliased, use the alias instead, e.g. `User.hasMany(Project, { as: 'jobs' })` will be `user.getJobs()`.
  *
- * @mixin HasMany
+ * @see {@link Model.hasMany}
  */
 class HasMany extends Association {
   constructor(source, target, options) {
-    super();
+    super(source, target, options);
 
     this.associationType = 'HasMany';
-    this.source = source;
-    this.target = target;
     this.targetAssociation = null;
-    this.options = options || {};
     this.sequelize = source.sequelize;
     this.through = options.through;
-    this.scope = options.scope;
     this.isMultiAssociation = true;
-    this.isSelfAssociation = this.source === this.target;
-    this.as = this.options.as;
     this.foreignKeyAttribute = {};
 
     if (this.options.through) {
       throw new Error('N:M associations are not supported with hasMany. Use belongsToMany instead');
     }
-
 
     /*
     * If self association, this is the target association
@@ -83,6 +77,19 @@ class HasMany extends Association {
       this.foreignKeyField = this.target.rawAttributes[this.foreignKey].field || this.foreignKey;
     }
 
+    this.sourceKey = this.options.sourceKey || this.source.primaryKeyAttribute;
+    if (this.target.rawAttributes[this.sourceKey]) {
+      this.sourceKeyField = this.source.rawAttributes[this.sourceKey].field || this.sourceKey;
+    } else {
+      this.sourceKeyField = this.sourceKey;
+    }
+
+    if (this.source.fieldRawAttributesMap[this.sourceKey]) {
+      this.sourceKeyAttribute = this.source.fieldRawAttributesMap[this.sourceKey].fieldName;
+    } else {
+      this.sourceKeyAttribute = this.source.primaryKeyAttribute;
+    }
+    this.sourceIdentifier = this.sourceKey;
     this.associationAccessor = this.as;
 
     // Get singular and plural names, trying to uppercase the first letter, unless the model forbids it
@@ -90,102 +97,15 @@ class HasMany extends Association {
     const singular = Utils.uppercaseFirst(this.options.name.singular);
 
     this.accessors = {
-      /**
-       * Get everything currently associated with this, using an optional where clause.
-       *
-       * @param {Object} [options]
-       * @param {Object} [options.where] An optional where clause to limit the associated models
-       * @param {String|Boolean} [options.scope] Apply a scope on the related model, or remove its default scope by passing false
-       * @param {String} [options.schema] Apply a schema on the related model
-       * @see {Model#findAll}  for a full explanation of options
-       * @return {Promise<Array<Instance>>}
-       * @method getAssociations
-       */
       get: 'get' + plural,
-      /**
-       * Set the associated models by passing an array of persisted instances or their primary keys. Everything that is not in the passed array will be un-associated
-       *
-       * @param {Array<Instance|String|Number>} [newAssociations] An array of persisted instances or primary key of instances to associate with this. Pass `null` or `undefined` to remove all associations.
-       * @param {Object} [options] Options passed to `target.findAll` and `update`.
-       * @param {Object} [options.validate] Run validation for the join model
-       * @return {Promise}
-       * @method setAssociations
-       */
       set: 'set' + plural,
-      /**
-       * Associate several persisted instances with this.
-       *
-       * @param {Array<Instance|String|Number>} [newAssociations] An array of persisted instances or primary key of instances to associate with this.
-       * @param {Object} [options] Options passed to `target.update`.
-       * @param {Object} [options.validate] Run validation for the join model.
-       * @return {Promise}
-       * @method addAssociations
-       */
       addMultiple: 'add' + plural,
-      /**
-       * Associate a persisted instance with this.
-       *
-       * @param {Instance|String|Number} [newAssociation] A persisted instance or primary key of instance to associate with this.
-       * @param {Object} [options] Options passed to `target.update`.
-       * @param {Object} [options.validate] Run validation for the join model.
-       * @return {Promise}
-       * @method addAssociation
-       */
       add: 'add' + singular,
-      /**
-       * Create a new instance of the associated model and associate it with this.
-       *
-       * @param {Object} [values]
-       * @param {Object} [options] Options passed to `target.create`.
-       * @return {Promise}
-       * @method createAssociation
-       */
       create: 'create' + singular,
-      /**
-       * Un-associate the instance.
-       *
-       * @param {Instance|String|Number} [oldAssociated] Can be an Instance or its primary key
-       * @param {Object} [options] Options passed to `target.update`
-       * @return {Promise}
-       * @method removeAssociation
-       */
       remove: 'remove' + singular,
-      /**
-       * Un-associate several instances.
-       *
-       * @param {Array<Instance|String|Number>} [oldAssociatedArray] Can be an array of instances or their primary keys
-       * @param {Object} [options] Options passed to `through.destroy`
-       * @return {Promise}
-       * @method removeAssociations
-       */
       removeMultiple: 'remove' + plural,
-      /**
-       * Check if an instance is associated with this.
-       *
-       * @param {Instance|String|Number} [instance] Can be an Instance or its primary key
-       * @param {Object} [options] Options passed to getAssociations
-       * @return {Promise}
-       * @method hasAssociation
-       */
       hasSingle: 'has' + singular,
-      /**
-       * Check if all instances are associated with this.
-       *
-       * @param {Array<Instance|String|Number>} [instances] Can be an array of instances or their primary keys
-       * @param {Object} [options] Options passed to getAssociations
-       * @return {Promise}
-       * @method hasAssociations
-       */
       hasAll: 'has' + plural,
-      /**
-       * Count everything currently associated with this, using an optional where clause.
-       *
-       * @param {Object} [options]
-       * @param {Object} [options.where] An optional where clause to limit the associated models
-       * @param {String|Boolean} [options.scope] Apply a scope on the related model, or remove its default scope by passing false
-       * @return {Promise<Int>}
-       * @method countAssociations
-       */
       count: 'count' + plural
     };
   }
@@ -196,7 +116,7 @@ class HasMany extends Association {
     const newAttributes = {};
     const constraintOptions = _.clone(this.options); // Create a new options object for use with addForeignKeyConstraints, to avoid polluting this.options in case it is later used for a n:m
     newAttributes[this.foreignKey] = _.defaults({}, this.foreignKeyAttribute, {
-      type: this.options.keyType || this.source.rawAttributes[this.source.primaryKeyAttribute].type,
+      type: this.options.keyType || this.source.rawAttributes[this.sourceKeyAttribute].type,
       allowNull : true
     });
 
@@ -205,7 +125,7 @@ class HasMany extends Association {
       constraintOptions.onDelete = constraintOptions.onDelete || (target.allowNull ? 'SET NULL' : 'CASCADE');
       constraintOptions.onUpdate = constraintOptions.onUpdate || 'CASCADE';
     }
-    Helpers.addForeignKeyConstraints(newAttributes[this.foreignKey], this.source, this.target, constraintOptions);
+    Helpers.addForeignKeyConstraints(newAttributes[this.foreignKey], this.source, this.target, constraintOptions, this.sourceKeyField);
     Utils.mergeDefaults(this.target.rawAttributes, newAttributes);
 
     this.identifierField = this.target.rawAttributes[this.foreignKey].field || this.foreignKey;
@@ -220,39 +140,27 @@ class HasMany extends Association {
   }
 
   mixin(obj) {
-    const association = this;
-
-    obj[this.accessors.get] = function(options) {
-      return association.get(this, options);
+    const methods = ['get', 'count', 'hasSingle', 'hasAll', 'set', 'add', 'addMultiple', 'remove', 'removeMultiple', 'create'];
+    const aliases = {
+      hasSingle: 'has',
+      hasAll: 'has',
+      addMultiple: 'add',
+      removeMultiple: 'remove'
     };
 
-    if (this.accessors.count) {
-      obj[this.accessors.count] = function(options) {
-        return association.count(this, options);
-      };
-    }
-
-    obj[this.accessors.hasSingle] = obj[this.accessors.hasAll] = function(instances, options) {
-      return association.has(this, instances, options);
-    };
-
-    obj[this.accessors.set] = function(instances, options) {
-      return association.set(this, instances, options);
-    };
-
-    obj[this.accessors.add] = obj[this.accessors.addMultiple] = function(instances, options) {
-      return association.add(this, instances, options);
-    };
-
-    obj[this.accessors.remove] = obj[this.accessors.removeMultiple] = function(instances, options) {
-      return association.remove(this, instances, options);
-    };
-
-    obj[this.accessors.create] = function(values, options) {
-      return association.create(this, values, options);
-    };
+    Helpers.mixinMethods(this, obj, methods, aliases);
   }
 
+  /**
+   * Get everything currently associated with this, using an optional where clause.
+   *
+   * @param {Object} [options]
+   * @param {Object} [options.where] An optional where clause to limit the associated models
+   * @param {String|Boolean} [options.scope] Apply a scope on the related model, or remove its default scope by passing false
+   * @param {String} [options.schema] Apply a schema on the related model
+   * @see {@link Model.findAll}  for a full explanation of options
+   * @return {Promise<Array<Model>>}
+   */
   get(instances, options) {
     const association = this;
     const where = {};
@@ -272,12 +180,12 @@ class HasMany extends Association {
     }
 
     if (instances) {
-      values = instances.map(instance => instance.get(association.source.primaryKeyAttribute, {raw: true}));
+      values = instances.map(instance => instance.get(association.sourceKey, {raw: true}));
 
       if (options.limit && instances.length > 1) {
         options.groupedLimit = {
           limit: options.limit,
-          on: association.foreignKeyField,
+          on: association,
           values
         };
 
@@ -289,7 +197,7 @@ class HasMany extends Association {
         delete options.groupedLimit;
       }
     } else {
-      where[association.foreignKey] = instance.get(association.source.primaryKeyAttribute, {raw: true});
+      where[association.foreignKey] = instance.get(association.sourceKey, {raw: true});
     }
 
 
@@ -315,7 +223,7 @@ class HasMany extends Association {
 
       const result = {};
       for (const instance of instances) {
-        result[instance.get(association.source.primaryKeyAttribute, {raw: true})] = [];
+        result[instance.get(association.sourceKey, {raw: true})] = [];
       }
 
       for (const instance of results) {
@@ -326,6 +234,14 @@ class HasMany extends Association {
     });
   }
 
+  /**
+   * Count everything currently associated with this, using an optional where clause.
+   *
+   * @param {Object} [options]
+   * @param {Object} [options.where] An optional where clause to limit the associated models
+   * @param {String|Boolean} [options.scope] Apply a scope on the related model, or remove its default scope by passing false
+   * @return {Promise<Integer>}
+   */
   count(instance, options) {
     const association = this;
     const model = association.target;
@@ -338,9 +254,16 @@ class HasMany extends Association {
     options.raw = true;
     options.plain = true;
 
-    return this.get(instance, options).then(result => parseInt(result.count, 10));
+    return association.get(instance, options).then(result => parseInt(result.count, 10));
   }
 
+  /**
+   * Check if one or more rows are associated with `this`.
+   *
+   * @param {Model[]|Model|string[]|String|number[]|Number} [instance(s)]
+   * @param {Object} [options] Options passed to getAssociations
+   * @return {Promise}
+   */
   has(sourceInstance, targetInstances, options) {
     const association = this;
     const where = {};
@@ -371,9 +294,17 @@ class HasMany extends Association {
       ]
     };
 
-    return this.get(sourceInstance, options).then(associatedObjects => associatedObjects.length === targetInstances.length);
+    return association.get(sourceInstance, options).then(associatedObjects => associatedObjects.length === targetInstances.length);
   }
 
+  /**
+   * Set the associated models by passing an array of persisted instances or their primary keys. Everything that is not in the passed array will be un-associated
+   *
+   * @param {Array<Model|String|Number>} [newAssociations] An array of persisted instances or primary key of instances to associate with this. Pass `null` or `undefined` to remove all associations.
+   * @param {Object} [options] Options passed to `target.findAll` and `update`.
+   * @param {Object} [options.validate] Run validation for the join model
+   * @return {Promise}
+   */
   set(sourceInstance, targetInstances, options) {
     const association = this;
 
@@ -420,7 +351,7 @@ class HasMany extends Association {
         updateWhere = {};
 
         update = {};
-        update[association.foreignKey] = sourceInstance.get(association.source.primaryKeyAttribute);
+        update[association.foreignKey] = sourceInstance.get(association.sourceKey);
 
         _.assign(update, association.scope);
         updateWhere[association.target.primaryKeyAttribute] = unassociatedObjects.map(unassociatedObject =>
@@ -439,6 +370,14 @@ class HasMany extends Association {
     });
   }
 
+  /**
+   * Associate one or more target rows with `this`. This method accepts a Model / string / number to associate a single row,
+   * or a mixed array of Model / string / numbers to associate multiple rows.
+   *
+   * @param {Model[]|Model|string[]|string|number[]|number} [newAssociation(s)]
+   * @param {Object} [options] Options passed to `target.update`.
+   * @return {Promise}
+   */
   add(sourceInstance, targetInstances, options) {
     if (!targetInstances) return Utils.Promise.resolve();
 
@@ -450,7 +389,7 @@ class HasMany extends Association {
 
     targetInstances = association.toInstanceArray(targetInstances);
 
-    update[association.foreignKey] = sourceInstance.get(association.source.primaryKeyAttribute);
+    update[association.foreignKey] = sourceInstance.get(association.sourceKey);
     _.assign(update, association.scope);
 
     where[association.target.primaryKeyAttribute] = targetInstances.map(unassociatedObject =>
@@ -460,6 +399,13 @@ class HasMany extends Association {
     return association.target.unscoped().update(update, _.defaults({where}, options)).return(sourceInstance);
   }
 
+  /**
+   * Un-associate one or several target rows.
+   *
+   * @param {Model[]|Model|String[]|string|Number[]|number} [oldAssociatedInstance(s)]
+   * @param {Object} [options] Options passed to `target.update`
+   * @return {Promise}
+   */
   remove(sourceInstance, targetInstances, options) {
     const association = this;
     const update = {};
@@ -470,7 +416,7 @@ class HasMany extends Association {
 
     update[association.foreignKey] = null;
 
-    where[association.foreignKey] = sourceInstance.get(association.source.primaryKeyAttribute);
+    where[association.foreignKey] = sourceInstance.get(association.sourceKey);
     where[association.target.primaryKeyAttribute] = targetInstances.map(targetInstance =>
       targetInstance.get(association.target.primaryKeyAttribute)
     );
@@ -478,6 +424,13 @@ class HasMany extends Association {
     return association.target.unscoped().update(update, _.defaults({where}, options)).return(this);
   }
 
+  /**
+   * Create a new instance of the associated model and associate it with this.
+   *
+   * @param {Object} [values]
+   * @param {Object} [options] Options passed to `target.create`.
+   * @return {Promise}
+   */
   create(sourceInstance, values, options) {
     const association = this;
 
@@ -500,7 +453,7 @@ class HasMany extends Association {
       }
     }
 
-    values[association.foreignKey] = sourceInstance.get(association.source.primaryKeyAttribute);
+    values[association.foreignKey] = sourceInstance.get(association.sourceKey);
     if (options.fields) options.fields.push(association.foreignKey);
     return association.target.create(values, options);
   }

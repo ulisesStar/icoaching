@@ -1,22 +1,5 @@
-md-card(layout="row" layout-align="center center")
-	md-card-content
-		md-icon(md-colors="{color: 'cyan'}") star
-	span(flex)
-	//- Resolución completa
-	div.menu
-		md-menu-bar(hide-xs)
-			md-button(class="navbutton" ng-repeat="boton in botones" md-colors="{background: '{{boton.color}}'}" ui-sref="{{boton.sref}}")
-				md-icon(class="material-icons") {{boton.icon}}
-		//- Resolución mobil
-		md-menu-bar(hide-gt-xs)
-			md-menu
-				md-button(ng-click="$mdOpenMenu()")
-					md-icon.material-icons menu
-				md-menu-content
-					md-menu-item(ng-repeat="boton in botones")
-						md-button(class="navbutton" md-colors="{background: '{{boton.color}}'}" ui-sref="{{boton.sref}}") {{boton.title}}
-							md-icon(class="material-icons") {{boton.icon}}
-		md-button(ng-click="iniciosesion($event)" md-colors="{background: 'cyan'}")
-			md-icon settings
-
-		
+.header(flex="80" layout="row" layout-align="space-between center")
+	md-icon(md-svg-icon="logoblk.svg")
+	md-nav-bar(md-no-ink-bar="disableInkBar" md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links")
+		md-nav-item(md-nav-sref="home" name="Home") Home
+		md-nav-item(md-nav-sref="servicios" name="Servicios") Servicios

@@ -1,12 +1,13 @@
 'use strict';
 
 const _ = require('lodash');
+const moment = require('moment');
 const inherits = require('../../utils/inherits');
 
 module.exports = BaseTypes => {
   const warn = BaseTypes.ABSTRACT.warn.bind(undefined, 'https://msdn.microsoft.com/en-us/library/ms187752%28v=sql.110%29.aspx');
 
-  BaseTypes.DATE.types.mssql = [42];
+  BaseTypes.DATE.types.mssql = [43];
   BaseTypes.STRING.types.mssql = [231, 173];
   BaseTypes.CHAR.types.mssql = [175];
   BaseTypes.TEXT.types.mssql = false;
@@ -55,7 +56,7 @@ module.exports = BaseTypes => {
   STRING.prototype.toSql = function toSql() {
     if (!this._binary) {
       return 'NVARCHAR(' + this._length + ')';
-    } else{
+    } else {
       return 'BINARY(' + this._length + ')';
     }
   };
@@ -125,14 +126,17 @@ module.exports = BaseTypes => {
   inherits(DATE, BaseTypes.DATE);
 
   DATE.prototype.toSql = function toSql() {
-    return 'DATETIME2';
+    return 'DATETIMEOFFSET';
   };
 
-  DATE.prototype._stringify = function _stringify(date, options) {
-    date = this._applyTimezone(date, options);
+  function DATEONLY() {
+    if (!(this instanceof DATEONLY)) return new DATEONLY();
+    BaseTypes.DATEONLY.apply(this, arguments);
+  }
+  inherits(DATEONLY, BaseTypes.DATEONLY);
 
-    // mssql not allow +timezone datetime format
-    return date.format('YYYY-MM-DD HH:mm:ss.SSS');
+  DATEONLY.parse = function(value) {
+    return moment(value).format('YYYY-MM-DD');
   };
 
   function INTEGER(length) {
@@ -225,6 +229,7 @@ module.exports = BaseTypes => {
     STRING,
     UUID,
     DATE,
+    DATEONLY,
     NOW,
     INTEGER,
     BIGINT,

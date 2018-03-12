@@ -1,98 +1,50 @@
-app.run(['$rootScope', '$state', '$stateParams', function ($rootScope, $state, $stateParams) {
-	$rootScope.$state = $state;
-	$rootScope.$stateParams = $stateParams;
-}]);
+app.run([
+    '$rootScope',
+    '$state',
+    '$stateParams',
+    function($rootScope, $state, $stateParams) {
+        $rootScope.$state = $state;
+        $rootScope.$stateParams = $stateParams;
+    }
+]);
 
-app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider, $stateProvider) {
+app.config([
+    '$urlRouterProvider',
+    '$stateProvider',
+    function($urlRouterProvider, $stateProvider) {
 
-	$urlRouterProvider.otherwise('/');
-	$stateProvider
-
-	.state('home', {
-		url: '/',
-		views: {
-			'main': {
-				templateUrl: '/main/home'
-			}
-		}
-	}).state('user', {
-		url: '/user',
-		views: {
-			'main': {
-				templateUrl: '/user/main'
-			}
-		}
-	}).state('user.profile', {
-		url: '/profile',
-		views: {
-			'main': {
-				templateUrl: '/user/profile'
-			}
-		}
-	}).state('user.paymentstatus', {
-		url: '/paymentstatus',
-		views: {
-			'main': {
-				templateUrl: '/main/user/paymentstatus'
-			}
-		}
-	}).state('user.paymentmethod', {
-		url: '/metododepago',
-		views: {
-			'main': {
-				templateUrl: '/main/user/paymentmethod'
-			}
-		}
-	}).state('user.historical', {
-		url: '/pagohistorico',
-		views: {
-			'main': {
-				templateUrl: '/main/user/historical'
-			}
-		}
-	}).state('persona', {
-		url: '/persona/:idPersona',
-		views: {
-			'main': {
-				templateUrl: '/catalogo/persona',
-				controller: function ($scope, $stateParams, $http) {
-					var idPersona = $stateParams.idPersona;
-					$http.get('/data/personasData/' + idPersona ).then(function(persona){
-						// album.persona = persona.data;
-						$scope.personaSeleccionada = persona.data;
-						console.log($scope.personaSeleccionada);
-					});
+		function template(seccion, vista, url, params) {
+			let obj = {
+				url: url,
+				data: {
+					titulo: vista[0]
+				},
+				params: params,
+				views: {
+					'main': {
+						templateUrl: _(vista).union(['/' + seccion]).reverse().join('/'),
+						controller: vista[0] + 'Ctrl as ctrl'
+					}
+				},
+				resolve: {
+					loadMyCtrl: [
+						'$ocLazyLoad',
+						function($ocLazyLoad) {
+							return $ocLazyLoad.load([seccion + vista[0]]);
+						}
+					]
 				}
+			}
+			return obj
+		}
 
-			}
-		}
-	}).state('yellow', {
-		url: '/yellow',
-		views: {
-			'main': {
-				templateUrl: '/colors/yellow'
-			}
-		}
-	}).state('purple', {
-		url: '/purple',
-		views: {
-			'main': {
-				templateUrl: '/colors/purple'
-			}
-		}
-	}).state('blue', {
-		url: '/blue',
-		views: {
-			'main': {
-				templateUrl: '/colors/blue'
-			}
-		}
-	}).state('green', {
-		url: '/green',
-		views: {
-			'main': {
-				templateUrl: '/colors/green'
-			}
-		}
-	});
-}]);
+		$urlRouterProvider.otherwise('/');
+		$stateProvider
+
+		.state('home', template('main', ['home'], '/'))
+        .state('servicios', template('main', ['servicios'], '/servicios', { IdArea : null, IdModalidad : null, IdTipo: null  }))
+        .state('servicio', template('main', ['servicio'], '/servicio/:id'))
+
+
+	}
+]);

@@ -25,7 +25,7 @@ function addForeignKeyConstraints(newAttribute, source, target, options, key) {
       .map(key => source.rawAttributes[key].field || key).value();
 
     if (primaryKeys.length === 1) {
-      if (!!source._schema) {
+      if (source._schema) {
         newAttribute.references = {
           model: source.sequelize.queryInterface.QueryGenerator.addSchema({
             tableName: source.tableName,
@@ -44,3 +44,31 @@ function addForeignKeyConstraints(newAttribute, source, target, options, key) {
   }
 }
 exports.addForeignKeyConstraints = addForeignKeyConstraints;
+
+/**
+ * Mixin (inject) association methods to model prototype
+ *
+ * @private
+ * @param {Object} Association instance
+ * @param {Object} Model prototype
+ * @param {Array} Method names to inject
+ * @param {Object} Mapping between model and association method names
+ */
+function mixinMethods(association, obj, methods, aliases) {
+  aliases = aliases || {};
+
+  for (const method of methods) {
+    // don't override custom methods
+    if (!obj[association.accessors[method]]) {
+      const realMethod = aliases[method] || method;
+
+      obj[association.accessors[method]] = function() {
+        const instance = this;
+        const args = [instance].concat(Array.from(arguments));
+
+        return association[realMethod].apply(association, args);
+      };
+    }
+  }
+}
+exports.mixinMethods = mixinMethods;

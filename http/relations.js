@@ -4,21 +4,42 @@ var conector = require('./connection');
 
 //- Modelos
 
-var persona = require('./db/modeloPersona')(conector);
-var imagen = require('./db/modeloImagen')(conector);
-var interes = require('./db/modeloInteres')(conector);
-var personainteres = require('./db/modeloPersonaInteres')(conector);
 var usuario = require('./db/modeloUsuario')(conector);
+var imagenes = require('./db/modeloImagenes')(conector);
+var area = require('./db/modeloArea')(conector);
+var modalidad = require('./db/modeloModalidad')(conector);
+var servicio = require('./db/modeloServicio')(conector);
+var evento = require('./db/modeloEvento')(conector);
+var tipo = require('./db/modeloTipo')(conector);
 
 //- Relations
 
-persona.hasMany(imagen, {foreignKey: 'IdPersona', targetKey: 'id'});
+servicio.belongsTo(area, {as:'Area', foreignKey: 'IdArea'});
+area.hasMany(servicio, {as:'Servicio', foreignKey: 'IdArea'});
 
-interes.belongsToMany(persona, {through: personainteres, foreignKey: 'IdInteres'});
-persona.belongsToMany(interes, {through: personainteres, foreignKey: 'IdPersona'});
+servicio.belongsTo(modalidad, {as:'Modalidad', foreignKey: 'IdModalidad'});
+modalidad.hasMany(servicio, {as:'Servicio', foreignKey: 'IdModalidad'});
 
-module.exports.persona = persona;
-module.exports.imagen = imagen;
-module.exports.interes = interes;
-module.exports.personainteres = personainteres;
+servicio.belongsTo(tipo, {as:'Tipo', foreignKey: 'IdTipo'});
+tipo.hasMany(servicio, {as:'Servicio', foreignKey: 'IdTipo'});
+
+evento.belongsTo(servicio, {as:'Servicio', foreignKey: 'IdServicio'});
+servicio.hasMany(evento, {as:'Evento', foreignKey: 'IdServicio'});
+
+imagenes.belongsTo(evento, {as:'Evento', foreignKey: 'IdEvento'});
+evento.hasMany(imagenes, {as:'Imagen', foreignKey: 'IdEvento'});
+
+// servicios.hasMany(imagenes, {foreignKey: 'IdServicio'});
+// imagenes.belongsTo(servicios, {foreignKey: 'IdServicio'});
+//
+// foto.belongsTo(abogados, {foreignKey: 'IdAbogado'});
+// abogados.hasOne(foto, {foreignKey: 'IdAbogado'});
+
+
 module.exports.usuario = usuario;
+module.exports.imagenes = imagenes;
+module.exports.tipo = tipo;
+module.exports.area = area;
+module.exports.modalidad = modalidad;
+module.exports.servicio = servicio;
+module.exports.evento = evento;

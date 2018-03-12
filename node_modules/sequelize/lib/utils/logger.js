@@ -5,12 +5,12 @@
  * It require a `context` for which messages will be printed.
  *
  * @module logging
+ * @private
  */
 
-/* jshint -W030 */
-const depd = require('depd')
-    , debug = require('debug')
-    , _ = require('lodash');
+const depd = require('depd'),
+  debug = require('debug'),
+  _ = require('lodash');
 
 class Logger {
   constructor(config) {

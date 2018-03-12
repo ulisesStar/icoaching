@@ -71,21 +71,18 @@ get SQLite tests for free :)
 
 Makes sure `docker` and `docker-compose` are installed.
 
-If running on Mac OSX, install [Docker for Mac](https://docs.docker.com/docker-for-mac/).
+If running on macOS, install [Docker for Mac](https://docs.docker.com/docker-for-mac/).
 
-Then simply run:
+Now launch the docker mysql and postgres servers with this command (you can add `-d` to run them in daemon mode):
 
+```sh
+docker-compose up postgres-95 mysql-57
+```
+
+Then to run the tests simply run:
 ```sh
 npm run test-docker
 ```
-
-And once in a while you might want to run:
-
-```sh
-npm run build-docker
-```
-
-To rebuild the image (in case of changed dependencies or similar).
 
 If sequelize is unable to connect to mysql you might want to try running `sudo docker-compose up` in a second terminal window.
 
@@ -116,7 +113,7 @@ The generated documentation will be placed in `docs/tmp.md`.
 Just commit and send your pull request. Happy hacking and thank you for contributing.
 
 ### Coding Guidelines ###
-Have a look at our [.jshintrc](https://github.com/sequelize/sequelize/blob/master/.jshintrc) file for the specifics. As part of the test process, all files will be linted, and your PR will **not** be accepted if it does not pass linting.
+Have a look at our [.eslintrc](https://github.com/sequelize/sequelize/blob/master/.eslintrc) file for the specifics. As part of the test process, all files will be linted, and your PR will **not** be accepted if it does not pass linting.
 
 #### Spaces ####
 

@@ -1,0 +1,56 @@
+.evento
+	section.info
+		md-card
+			div(layout="row" layout-align="end center")
+				md-button(ng-click="editar = !editar")
+					md-icon edit
+			form.md-padding(layout="column")
+				md-input-container
+					label Nombre
+					input(ng-model="ctrl.evento.nombre" ng-disabled="editar")
+				div(layout="row" layout-align="center center")
+					md-input-container
+						label Fecha Inicial
+						md-datepicker(ng-model="ctrl.evento.fechainicial" md-placeholder="Fecha inicial" ng-disabled="editar")
+					md-input-container(flex)
+						label Precio Inicial
+						md-icon attach_money	
+						input(ng-model="ctrl.evento.precioinicial" ng-disabled="editar")
+					md-input-container
+						label Fecha Final
+						md-datepicker(ng-model="ctrl.evento.fechafinal" md-placeholder="Fecha Final" ng-disabled="editar")
+					md-input-container(flex)
+						label Precio Final
+						md-icon attach_money
+						input(ng-model="ctrl.evento.preciofinal" ng-disabled="editar")
+					md-button(ng-click="ctrl.refresh()" md-colors="{background : 'green'}") Refresh
+						md-icon loop
+			md-divider
+			#grafica
+	section.imagenes
+		md-card
+			md-grid-list(md-cols="4" md-row-height="1:1" style="margin-top:0px" md-gutter="30px")
+				md-grid-tile(md-colspan="2" md-rowspan="2")
+					form(layout="column" ng-submit="ctrl.subirImagen(imagen)")
+						.dropify-container(ng-init="Dropify()" ng-hide="inputImage" flex)
+							input.dropify(type="file" data-default-file="Imagen del producto" ng-model="area.imagen" base-sixty-four-input maxsize="5120" data-max-file-size="1000K" accept="image/*" style="padding:0px;")
+						.croppie-container(ng-show="inputImage" flex)
+							ng-croppie(src="inputImage"
+								ng-model='imagen'
+								update='onUpdate'
+								boundry="{w: 700, h: 600}"
+								viewport="{w: 600, h: 500}"
+								mousezoom="true" 
+								zoom="true" 
+								orientation="90"
+								type="square")
+						md-divider
+						md-button(md-colors="{background: 'green'}" type="submit")
+							md-icon save
+
+				md-grid-tile(md-colspan="1" md-rowspan="1" ng-repeat="imagen in ctrl.evento.imagenes")
+					.imagen(layout-fill)
+						img(src="{{imagen.imagen}}" ng-if="imagen")
+						md-card-title
+							md-card-title-text
+								.md-headline

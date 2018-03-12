@@ -1,5 +1,5 @@
 {
-  "name": "assets",
+  "name": "Starnode",
   "description": "",
   "main": "",
   "license": "MIT",
@@ -22,6 +22,19 @@
     "react": "15.4.1",
     "scrollmagic": "ScrollMagic#^2.0.5",
     "ngReact": "0.4.0",
-    "angular-ui-router": "1.0.3"
+    "angular-ui-router": "1.0.3",
+    "dropify": "^0.2.2",
+    "ngstorage": "^0.3.11",
+    "oclazyload": "^1.1.0",
+    "angular-google-maps": "^2.4.1",
+    "konva": "^1.6.8",
+    "axios": "^0.16.2",
+    "Croppie": "croppie#^2.5.0",
+    "ngCroppie": "^1.0.3",
+    "textAngular": "^1.5.16",
+    "angular-material-data-table": "^0.10.10",
+    "angulartics": "^1.5.0",
+    "slick-carousel": "^1.8.1",
+    "c3-angular": "^1.4.0"
   }
 }

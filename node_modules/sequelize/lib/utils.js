@@ -5,7 +5,7 @@ const SqlString = require('./sql-string');
 const _ = require('lodash').runInContext(); // Prevent anyone messing with template settings by creating a fresh copy
 const parameterValidator = require('./utils/parameter-validator');
 const Logger = require('./utils/logger');
-const uuid = require('node-uuid');
+const uuid = require('uuid');
 const Promise = require('./promise');
 const primitives = ['string', 'number', 'boolean'];
 
@@ -17,7 +17,7 @@ exports._ = _;
 exports.debug = logger.debug.bind(logger);
 exports.deprecate = logger.deprecate.bind(logger);
 exports.warn = logger.warn.bind(logger);
-exports.getLogger = () => ( logger );
+exports.getLogger = () =>  logger ;
 
 function useInflection(_inflection) {
   inflection = _inflection;
@@ -53,7 +53,7 @@ exports.isPrimitive = isPrimitive;
 
 // Same concept as _.merge, but don't overwrite properties that have already been assigned
 function mergeDefaults(a, b) {
-  return _.mergeWith(a, b, (objectValue, sourceValue) => {
+  return _.mergeWith(a, b, objectValue => {
     // If it's an object, let _ handle it this time, we will be called again for each property
     if (!this._.isPlainObject(objectValue) && objectValue !== undefined) {
       return objectValue;
@@ -183,39 +183,6 @@ function mapOptionFieldNames(options, Model) {
     options.where = mapWhereFieldNames(options.where, Model);
   }
 
-  if (Array.isArray(options.order)) {
-    for (const oGroup of options.order) {
-      let OrderModel;
-      let attr;
-      let attrOffset;
-
-      if (Array.isArray(oGroup)) {
-        OrderModel = Model;
-
-        // Check if we have ['attr', 'DESC'] or [Model, 'attr', 'DESC']
-        if (typeof oGroup[oGroup.length - 2] === 'string') {
-          attrOffset = 2;
-
-        // Assume ['attr'], [Model, 'attr'] or [seq.fn('somefn', 1), 'DESC']
-        } else {
-          attrOffset = 1;
-        }
-
-        attr = oGroup[oGroup.length - attrOffset];
-        if (oGroup.length > attrOffset) {
-          OrderModel = oGroup[oGroup.length - (attrOffset + 1)];
-          if (OrderModel.model) {
-            OrderModel = OrderModel.model;
-          }
-        }
-
-        if (OrderModel.rawAttributes && OrderModel.rawAttributes[attr] && attr !== OrderModel.rawAttributes[attr].field) {
-          oGroup[oGroup.length - attrOffset] = OrderModel.rawAttributes[attr].field;
-        }
-      }
-    }
-  }
-
   return options;
 }
 exports.mapOptionFieldNames = mapOptionFieldNames;
@@ -233,7 +200,10 @@ function mapWhereFieldNames(attributes, Model) {
         delete attributes[attribute];
       }
 
-      if (_.isPlainObject(attributes[attribute])) {
+      if (_.isPlainObject(attributes[attribute])
+        && !(rawAttribute && (
+          rawAttribute.type instanceof DataTypes.HSTORE
+          || rawAttribute.type instanceof DataTypes.JSON))) { // Prevent renaming of HSTORE & JSON fields
         attributes[attribute] = mapOptionFieldNames({
           where: attributes[attribute]
         }, Model).where;
@@ -280,14 +250,14 @@ function isColString(value) {
 exports.isColString = isColString;
 
 function argsArePrimaryKeys(args, primaryKeys) {
-  let result = (args.length === Object.keys(primaryKeys).length);
+  let result = args.length === Object.keys(primaryKeys).length;
   if (result) {
     _.each(args, arg => {
       if (result) {
         if (['number', 'string'].indexOf(typeof arg) !== -1) {
           result = true;
         } else {
-          result = (arg instanceof Date) || Buffer.isBuffer(arg);
+          result = arg instanceof Date || Buffer.isBuffer(arg);
         }
       }
     });
@@ -308,7 +278,7 @@ function canTreatArrayAsAnd(arr) {
 exports.canTreatArrayAsAnd = canTreatArrayAsAnd;
 
 function combineTableNames(tableName1, tableName2) {
-  return (tableName1.toLowerCase() < tableName2.toLowerCase()) ? (tableName1 + tableName2) : (tableName2 + tableName1);
+  return tableName1.toLowerCase() < tableName2.toLowerCase() ? tableName1 + tableName2 : tableName2 + tableName1;
 }
 exports.combineTableNames = combineTableNames;
 
@@ -344,7 +314,7 @@ function toDefaultValue(value) {
     return uuid.v4();
   } else if (value instanceof DataTypes.NOW) {
     return now();
-  } else if(_.isPlainObject(value) || _.isArray(value)) {
+  } else if (_.isPlainObject(value) || _.isArray(value)) {
     return _.clone(value);
   } else {
     return value;
@@ -358,6 +328,7 @@ exports.toDefaultValue = toDefaultValue;
  *
  * @param  {*} value Any default value.
  * @return {boolean} yes / no.
+ * @private
  */
 function defaultValueSchemable(value) {
   if (typeof value === 'undefined') { return false; }
@@ -386,7 +357,7 @@ function removeNullValuesFromHash(hash, omitNull, options) {
     const _hash = {};
 
     _.forIn(hash, (val, key) => {
-      if (options.allowNull.indexOf(key) > -1 || key.match(/Id$/) || ((val !== null) && (val !== undefined))) {
+      if (options.allowNull.indexOf(key) > -1 || key.match(/Id$/) || val !== null && val !== undefined) {
         _hash[key] = val;
       }
     });
@@ -421,7 +392,7 @@ exports.sliceArgs = sliceArgs;
 
 function now(dialect) {
   const now = new Date();
-  if (['postgres', 'sqlite'].indexOf(dialect) === -1) {
+  if (['mysql', 'postgres', 'sqlite'].indexOf(dialect) === -1) {
     now.setMilliseconds(0);
   }
   return now;
@@ -449,9 +420,14 @@ exports.removeTicks = removeTicks;
 /**
  * Utility functions for representing SQL functions, and columns that should be escaped.
  * Please do not use these functions directly, use Sequelize.fn and Sequelize.col instead.
+ * @private
  */
-class Fn {
+class SequelizeMethod {}
+exports.SequelizeMethod = SequelizeMethod;
+
+class Fn extends SequelizeMethod {
   constructor(fn, args) {
+    super();
     this.fn = fn;
     this.args = args;
   }
@@ -461,8 +437,9 @@ class Fn {
 }
 exports.Fn = Fn;
 
-class Col {
+class Col extends SequelizeMethod {
   constructor(col) {
+    super();
     if (arguments.length > 1) {
       col = this.sliceArgs(arguments);
     }
@@ -471,23 +448,26 @@ class Col {
 }
 exports.Col = Col;
 
-class Cast {
+class Cast extends SequelizeMethod {
   constructor(val, type) {
+    super();
     this.val = val;
     this.type = (type || '').trim();
   }
 }
 exports.Cast = Cast;
 
-class Literal {
+class Literal extends SequelizeMethod {
   constructor(val) {
+    super();
     this.val = val;
   }
 }
 exports.Literal = Literal;
 
-class Json {
+class Json extends SequelizeMethod {
   constructor(conditionsOrPath, value) {
+    super();
     if (_.isObject(conditionsOrPath)) {
       this.conditions = conditionsOrPath;
     } else {
@@ -500,8 +480,9 @@ class Json {
 }
 exports.Json = Json;
 
-class Where {
+class Where extends SequelizeMethod {
   constructor(attribute, comparator, logic) {
+    super();
     if (logic === undefined) {
       logic = comparator;
       comparator = '=';
@@ -514,11 +495,24 @@ class Where {
 }
 exports.Where = Where;
 
-Where.prototype._isSequelizeMethod =
-Literal.prototype._isSequelizeMethod =
-Cast.prototype._isSequelizeMethod =
-Fn.prototype._isSequelizeMethod =
-Col.prototype._isSequelizeMethod =
-Json.prototype._isSequelizeMethod = true;
-
 exports.validateParameter = parameterValidator;
+
+
+exports.mapIsolationLevelStringToTedious = (isolationLevel, tedious) => {
+  if (!tedious) {
+    throw new Error('An instance of tedious lib should be passed to this function');
+  }
+  const tediousIsolationLevel = tedious.ISOLATION_LEVEL;
+  switch (isolationLevel) {
+    case 'READ_UNCOMMITTED':
+      return tediousIsolationLevel.READ_UNCOMMITTED;
+    case 'READ_COMMITTED':
+      return tediousIsolationLevel.READ_COMMITTED;
+    case 'REPEATABLE_READ':
+      return tediousIsolationLevel.REPEATABLE_READ;
+    case 'SERIALIZABLE':
+      return tediousIsolationLevel.SERIALIZABLE;
+    case 'SNAPSHOT':
+      return tediousIsolationLevel.SNAPSHOT;
+  }
+};

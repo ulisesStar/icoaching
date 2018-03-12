@@ -4,7 +4,6 @@ const Utils = require('../../utils');
 const AbstractQueryGenerator = require('../abstract/query-generator');
 
 const QueryGenerator = {
-  /* jshint proto:true */
   __proto__: AbstractQueryGenerator,
   dialect: 'mysql',
 
@@ -23,10 +22,11 @@ const QueryGenerator = {
   createTableQuery(tableName, attributes, options) {
     options = Utils._.extend({
       engine: 'InnoDB',
-      charset: null
+      charset: null,
+      rowFormat: null
     }, options || {});
 
-    const query = 'CREATE TABLE IF NOT EXISTS <%= table %> (<%= attributes%>) ENGINE=<%= engine %><%= comment %><%= charset %><%= collation %><%= initialAutoIncrement %>';
+    const query = 'CREATE TABLE IF NOT EXISTS <%= table %> (<%= attributes%>) ENGINE=<%= engine %><%= comment %><%= charset %><%= collation %><%= initialAutoIncrement %><%= rowFormat %>';
     const primaryKeys = [];
     const foreignKeys = {};
     const attrStr = [];
@@ -63,13 +63,14 @@ const QueryGenerator = {
       attributes: attrStr.join(', '),
       comment: options.comment && Utils._.isString(options.comment) ? ' COMMENT ' + this.escape(options.comment) : '',
       engine: options.engine,
-      charset: (options.charset ? ' DEFAULT CHARSET=' + options.charset : ''),
-      collation: (options.collate ? ' COLLATE ' + options.collate : ''),
-      initialAutoIncrement: (options.initialAutoIncrement ? ' AUTO_INCREMENT=' + options.initialAutoIncrement : '')
+      charset: options.charset ? ' DEFAULT CHARSET=' + options.charset : '',
+      collation: options.collate ? ' COLLATE ' + options.collate : '',
+      rowFormat: options.rowFormat ? ' ROW_FORMAT=' + options.rowFormat : '',
+      initialAutoIncrement: options.initialAutoIncrement ? ' AUTO_INCREMENT=' + options.initialAutoIncrement : ''
     };
     const pkString = primaryKeys.map(pk => this.quoteIdentifier(pk)).join(', ');
 
-    if (!!options.uniqueKeys) {
+    if (options.uniqueKeys) {
       Utils._.each(options.uniqueKeys, (columns, indexName) => {
         if (!columns.singleField) { // If it's a single field its handled in column def, not as an index
           if (!Utils._.isString(indexName)) {
@@ -176,7 +177,7 @@ const QueryGenerator = {
       options.limit = 1;
     }
 
-    if (!!options.limit) {
+    if (options.limit) {
       limit = ' LIMIT ' + this.escape(options.limit);
     }
 
@@ -189,6 +190,25 @@ const QueryGenerator = {
 
   showIndexesQuery(tableName, options) {
     return 'SHOW INDEX FROM ' + this.quoteTable(tableName) + ((options || {}).database ? ' FROM `' + options.database + '`' : '');
+  },
+
+  showConstraintsQuery(tableName, constraintName) {
+    let sql = [
+      'SELECT CONSTRAINT_CATALOG AS constraintCatalog,',
+      'CONSTRAINT_NAME AS constraintName,',
+      'CONSTRAINT_SCHEMA AS constraintSchema,',
+      'CONSTRAINT_TYPE AS constraintType,',
+      'TABLE_NAME AS tableName,',
+      'TABLE_SCHEMA AS tableSchema',
+      'from INFORMATION_SCHEMA.TABLE_CONSTRAINTS',
+      `WHERE table_name='${tableName}'`
+    ].join(' ');
+
+    if (constraintName) {
+      sql += ` AND constraint_name = '${constraintName}'`;
+    }
+
+    return sql + ';';
   },
 
   removeIndexQuery(tableName, indexNameOrAttributes) {
@@ -293,7 +313,7 @@ const QueryGenerator = {
 
   quoteIdentifier(identifier) {
     if (identifier === '*') return identifier;
-    return Utils.addTicks(identifier, '`');
+    return Utils.addTicks(Utils.removeTicks(identifier, '`'), '`');
   },
 
   /**
@@ -302,6 +322,7 @@ const QueryGenerator = {
    * @param  {String} tableName  The name of the table.
    * @param  {String} schemaName The name of the schema.
    * @return {String}            The generated sql query.
+   * @private
    */
   getForeignKeysQuery(tableName, schemaName) {
     return "SELECT CONSTRAINT_NAME as constraint_name FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE where TABLE_NAME = '" + tableName + /* jshint ignore: line */
@@ -314,6 +335,7 @@ const QueryGenerator = {
    * @param  {String} tableName  The name of the table.
    * @param  {String} columnName The name of the column.
    * @return {String}            The generated sql query.
+   * @private
    */
   getForeignKeyQuery(table, columnName) {
     let tableName = table.tableName || table;
@@ -335,6 +357,7 @@ const QueryGenerator = {
    * @param  {String} tableName  The name of the table.
    * @param  {String} foreignKey The name of the foreign key constraint.
    * @return {String}            The generated sql query.
+   * @private
    */
   dropForeignKeyQuery(tableName, foreignKey) {
     return 'ALTER TABLE ' + this.quoteTable(tableName) + ' DROP FOREIGN KEY ' + this.quoteIdentifier(foreignKey) + ';';

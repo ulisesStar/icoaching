@@ -1,0 +1,93 @@
+.servicio
+	md-card
+		form(ng-init="!editar" layout="column" style="margin  : 0px")
+			.servicio-content(layout="row")
+				div(layout="column" flex)
+					div(layout="row" layout-align="space-between center")
+						.md-padding
+							h4 Servicio
+						.opciones
+							md-button(ng-click="ctrl.servicio.guardar()")
+								md-icon save
+							md-button(ng-click="editar = !editar")
+								md-icon edit
+							md-button(ng-click="area = !area") Mostrar area
+					.md-padding
+						md-input-container(style="width: 100%")
+							label nombre
+							input(ng-model="ctrl.servicio.nombre" ng-disabled="!editar")
+						div(layout="row" flex)
+							md-switch(ng-model="ctrl.servicio.status" aria-label="status" ng-true-value="1" ng-false-value="0")
+							md-input-container(flex)
+								md-select(ng-model="ctrl.servicio.IdTipo" ng-change="ctrl.cambiarArea()" placeholder="Selecciona el Area" class="md-no-underline")
+									md-option(value="1") Personal
+									md-option(value="2") Empresarial
+							md-input-container(flex)
+								md-select(ng-model="ctrl.servicio.IdArea" ng-change="ctrl.cambiarArea()" placeholder="Selecciona el Area" class="md-no-underline")
+									md-option(value="1") Leadership
+									md-option(value="2") Bilateral Resset
+							md-input-container(flex)
+								md-select(ng-model="ctrl.servicio.IdModalidad" placeholder="Selecciona una modalidad" class="md-no-underline")
+									md-option(value="{{modalidad.id}}" ng-repeat="modalidad in ctrl.modalidades") {{modalidad.nombre}}
+									md-expansion-panel(md-component-id='panelOne')
+					
+					md-expansion-panel
+						md-expansion-panel-collapsed
+							md-expansion-panel-header Descripcion
+						md-expansion-panel-expanded
+							md-expansion-panel-header Descripcion
+							md-expansion-panel-content
+								text-angular(ng-model="ctrl.servicio.descripcion")
+							md-expansion-panel-footer(ng-click="$panel.collapse()")
+								md-icon keyboard_arrow_up
+					md-expansion-panel
+						md-expansion-panel-collapsed
+							md-expansion-panel-header Programa
+						md-expansion-panel-expanded
+							md-expansion-panel-header Programa
+							md-expansion-panel-content
+								text-angular(ng-model="ctrl.servicio.programa")
+							md-expansion-panel-footer(ng-click="$panel.collapse()")
+								md-icon keyboard_arrow_up
+
+						
+				.area(layout="column" style="background-color : {{ctrl.area.color}}" ng-if="ctrl.area && area" flex)
+					div(layout="row" layout-align="space-between center")
+						.md-padding
+							h4 Area
+						.opciones
+							md-button(ng-click="ctrl.area.guardar()")
+								md-icon save
+							md-button(ng-click="editar = !editar")
+								md-icon edit
+					.md-padding
+						form(layout="column")
+							md-input-container(flex)
+								label nombre del area
+								input(ng-model="ctrl.area.nombre")
+							text-angular(ng-model="ctrl.area.descripcion")
+			md-expansion-panel
+				md-expansion-panel-collapsed
+					md-expansion-panel-header Eventos
+				md-expansion-panel-expanded
+					md-expansion-panel-header 
+						md-button(ng-click="ctrl.eventos.crear()")
+							md-icon add
+						span Eventos
+					md-expansion-panel-content
+						md-list
+							md-list-item(ng-repeat="evento in ctrl.eventos.items" ui-sref="evento({id : evento.id})")
+								.md-list-item-text
+									p {{evento.nombre}}
+					md-expansion-panel-footer(ng-click="$panel.collapse()")
+						md-icon keyboard_arrow_up
+			md-expansion-panel
+				md-expansion-panel-collapsed
+					md-expansion-panel-header Imagenes
+				md-expansion-panel-expanded
+					md-expansion-panel-header Imagenes
+					md-expansion-panel-content
+						
+					md-expansion-panel-footer(ng-click="$panel.collapse()")
+						md-icon keyboard_arrow_up
+			

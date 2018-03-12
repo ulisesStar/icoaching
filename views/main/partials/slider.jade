@@ -1,0 +1,5 @@
+md-progress-circular(md-mode="indeterminate" ng-if="!ctrl.imagenes" ng-disabled="ctrl.imagenes")
+.slider-container(ng-if="ctrl.imagenes")
+    .slider(id="{{ctrl.id}}")
+        imagen(ng-repeat="imagen in ctrl.imagenes" id="imagen")
+            

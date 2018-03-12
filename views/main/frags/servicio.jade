@@ -1,0 +1,38 @@
+.servicio
+	.imagenes
+		.titulo
+			h2 {{ctrl.servicio.nombre}}
+		#central
+			imagen(id="id" ng-repeat="id in ctrl.servicio.imagenes" )
+		#slider
+			imagen(id="id" ng-repeat="id in ctrl.servicio.imagenes" )
+		md-progress-linear(md-mode="indeterminate" ng-if="ctrl.servicio.imagenes" ng-disabled="ctrl.servicio.imagenes")
+	.relaciones
+		md-button {{ctrl.area.nombre}}
+		md-button {{ctrl.modalidad.nombre}}
+		md-button {{ctrl.tipo.nombre}}
+	.servicio-content(layout="row")
+		.info(flex)			
+			.info-content
+				h3 Descripcion
+				p(ng-bind-html="ctrl.servicio.descripcion")
+		.prospecto(flex style="background-color : {{ctrl.area.color }}   ")
+			form(layout="column" ng-submit="crearProspecto()" )
+				md-input-container
+					label Nombre
+					input
+				md-input-container
+					label Telefono
+					input
+				md-input-container
+					label Correo
+					input
+				md-button(type="submit")
+					md-icon done
+				
+			
+	.programa(layout="row" layout-align="center center")
+		.programa-content(flex="80")
+			h3 Programa
+			p(ng-bind-html="ctrl.servicio.programa")
+		

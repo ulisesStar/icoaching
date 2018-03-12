@@ -13,6 +13,7 @@ const QueryTypes = require('./query-types');
 /**
  * The interface that Sequelize uses to talk to all databases
  * @class QueryInterface
+ * @private
  */
 class QueryInterface {
   constructor(sequelize) {
@@ -52,7 +53,7 @@ class QueryInterface {
     const showSchemasSql = this.QueryGenerator.showSchemasQuery();
 
     return this.sequelize.query(showSchemasSql, options).then(schemaNames => Utils._.flatten(
-        Utils._.map(schemaNames, value => (!!value.schema_name ? value.schema_name : value))
+        Utils._.map(schemaNames, value => value.schema_name ? value.schema_name : value)
     ));
   }
 
@@ -119,10 +120,10 @@ class QueryInterface {
                 valueOptions.after = null;
 
                 if (enumVals.indexOf(value) === -1) {
-                  if (!!vals[idx + 1]) {
+                  if (vals[idx + 1]) {
                     valueOptions.before = vals[idx + 1];
                   }
-                  else if (!!vals[idx - 1]) {
+                  else if (vals[idx - 1]) {
                     valueOptions.after = vals[idx - 1];
                   }
                   valueOptions.supportsSearchPath = false;
@@ -135,10 +136,10 @@ class QueryInterface {
         }
 
         if (!tableName.schema &&
-          (options.schema || (!!model && model._schema))) {
+          (options.schema || !!model && model._schema)) {
           tableName = this.QueryGenerator.addSchema({
             tableName,
-            _schema: (!!model && model._schema) || options.schema
+            _schema: !!model && model._schema || options.schema
           });
         }
 
@@ -153,10 +154,10 @@ class QueryInterface {
       });
     } else {
       if (!tableName.schema &&
-        (options.schema || (!!model && model._schema))) {
+        (options.schema || !!model && model._schema)) {
         tableName = this.QueryGenerator.addSchema({
           tableName,
-          _schema: (!!model && model._schema) || options.schema
+          _schema: !!model && model._schema || options.schema
         });
       }
 
@@ -184,7 +185,7 @@ class QueryInterface {
       if (this.sequelize.options.dialect === 'postgres') {
         const instanceTable = this.sequelize.modelManager.getModel(tableName, { attribute: 'tableName' });
 
-        if (!!instanceTable) {
+        if (instanceTable) {
           const getTableName = (!options || !options.schema || options.schema === 'public' ? '' : options.schema + '_') + tableName;
 
           const keys = Object.keys(instanceTable.rawAttributes);
@@ -372,6 +373,10 @@ class QueryInterface {
   renameColumn(tableName, attrNameBefore, attrNameAfter, options) {
     options = options || {};
     return this.describeTable(tableName, options).then(data => {
+      if (!data[attrNameBefore]) {
+        throw new Error('Table ' + tableName + ' doesn\'t have the column ' + attrNameBefore);
+      }
+
       data = data[attrNameBefore] || {};
 
       const _options = {};
@@ -461,6 +466,53 @@ class QueryInterface {
     return this.sequelize.query(sql, options);
   }
 
+  addConstraint(tableName, attributes, options, rawTablename) {
+    if (!Array.isArray(attributes)) {
+      rawTablename = options;
+      options = attributes;
+      attributes = options.fields;
+    }
+
+    if (!options.type) {
+      throw new Error('Constraint type must be specified through options.type');
+    }
+
+    if (!rawTablename) {
+      // Map for backwards compat
+      rawTablename = tableName;
+    }
+
+    options = Utils.cloneDeep(options);
+    options.fields = attributes;
+
+    if (this.sequelize.dialect.name === 'sqlite') {
+      return SQLiteQueryInterface.addConstraint.call(this, tableName, options, rawTablename);
+    } else {
+      const sql = this.QueryGenerator.addConstraintQuery(tableName, options, rawTablename);
+      return this.sequelize.query(sql, options);
+    }
+  }
+
+  showConstraint(tableName, options) {
+    const sql = this.QueryGenerator.showConstraintsQuery(tableName, options);
+    return this.sequelize.query(sql, Object.assign({}, options, { type: QueryTypes.SHOWCONSTRAINTS }));
+  }
+
+  removeConstraint(tableName, constraintName, options) {
+    options = options || {};
+
+    switch (this.sequelize.options.dialect) {
+      case 'mysql':
+        //Mysql does not support DROP CONSTRAINT. Instead DROP PRIMARY, FOREIGN KEY, INDEX should be used
+        return MySQLQueryInterface.removeConstraint.call(this, tableName, constraintName, options);
+      case 'sqlite':
+        return SQLiteQueryInterface.removeConstraint.call(this, tableName, constraintName, options);
+      default:
+        const sql = this.QueryGenerator.removeConstraintQuery(tableName, constraintName);
+        return this.sequelize.query(sql, options);
+    }
+  }
+
   insert(instance, tableName, values, options) {
     options = Utils.cloneDeep(options);
     options.hasTrigger = instance && instance.constructor.options.hasTrigger;
@@ -469,9 +521,9 @@ class QueryInterface {
     options.type = QueryTypes.INSERT;
     options.instance = instance;
 
-    return this.sequelize.query(sql, options).then(result => {
-      if (instance) result.isNewRecord = false;
-      return result;
+    return this.sequelize.query(sql, options).then(results => {
+      if (instance) results[0].isNewRecord = false;
+      return results;
     });
   }
 
@@ -493,7 +545,7 @@ class QueryInterface {
     });
 
     Utils._.each(model.options.indexes, value => {
-      if (value.unique === true) {
+      if (value.unique) {
         // fields in the index may both the strings or objects with an attribute property - lets sanitize that
         indexFields = Utils._.map(value.fields, field => {
           if (Utils._.isPlainObject(field)) {
@@ -536,30 +588,16 @@ class QueryInterface {
     options = _.clone(options) || {};
     options.type = QueryTypes.INSERT;
     const sql = this.QueryGenerator.bulkInsertQuery(tableName, records, options, attributes);
-    return this.sequelize.query(sql, options);
+    return this.sequelize.query(sql, options).then(results => results[0]);
   }
 
   update(instance, tableName, values, identifier, options) {
     options = _.clone(options || {});
     options.hasTrigger = !!(instance && instance._modelOptions && instance._modelOptions.hasTrigger);
 
-
     const sql = this.QueryGenerator.updateQuery(tableName, values, identifier, options, instance.constructor.rawAttributes);
-    let restrict = false;
 
     options.type = QueryTypes.UPDATE;
-
-    // Check for a restrict field
-    if (instance.constructor && instance.constructor.associations) {
-      const keys = Object.keys(instance.constructor.associations);
-      const length = keys.length;
-
-      for (let i = 0; i < length; i++) {
-        if (instance.constructor.associations[keys[i]].options && instance.constructor.associations[keys[i]].options.onUpdate && instance.constructor.associations[keys[i]].options.onUpdate === 'restrict') {
-          restrict = true;
-        }
-      }
-    }
 
     options.instance = instance;
     return this.sequelize.query(sql, options);
@@ -637,7 +675,17 @@ class QueryInterface {
   }
 
   increment(instance, tableName, values, identifier, options) {
-    const sql = this.QueryGenerator.incrementQuery(tableName, values, identifier, options.attributes);
+    const sql = this.QueryGenerator.arithmeticQuery('+', tableName, values, identifier, options.attributes);
+
+    options = _.clone(options) || {};
+
+    options.type = QueryTypes.UPDATE;
+    options.instance = instance;
+    return this.sequelize.query(sql, options);
+  }
+
+  decrement(instance, tableName, values, identifier, options) {
+    const sql = this.QueryGenerator.arithmeticQuery('-', tableName, values, identifier, options.attributes);
 
     options = _.clone(options) || {};
 
@@ -765,6 +813,7 @@ class QueryInterface {
    * Escape an identifier (e.g. a table or attribute name). If force is true,
    * the identifier will be quoted even if the `quoteIdentifiers` option is
    * false.
+   * @private
    */
   quoteIdentifier(identifier, force) {
     return this.QueryGenerator.quoteIdentifier(identifier, force);
@@ -778,6 +827,7 @@ class QueryInterface {
    * Split an identifier into .-separated tokens and quote each part.
    * If force is true, the identifier will be quoted even if the
    * `quoteIdentifiers` option is false.
+   * @private
    */
   quoteIdentifiers(identifiers, force) {
     return this.QueryGenerator.quoteIdentifiers(identifiers, force);
@@ -785,6 +835,7 @@ class QueryInterface {
 
   /**
    * Escape a value (e.g. a string, number or date)
+   * @private
    */
   escape(value) {
     return this.QueryGenerator.escape(value);
@@ -843,7 +894,7 @@ class QueryInterface {
     options = _.assign({}, options, {
       transaction: transaction.parent || transaction
     });
-
+    options.transaction.name = transaction.parent ? transaction.name : undefined;
     const sql = this.QueryGenerator.startTransactionQuery(transaction);
 
     return this.sequelize.query(sql, options);
@@ -894,7 +945,7 @@ class QueryInterface {
       transaction: transaction.parent || transaction,
       supportsSearchPath: false
     });
-
+    options.transaction.name = transaction.parent ? transaction.name : undefined;
     const sql = this.QueryGenerator.rollbackTransactionQuery(transaction);
     const promise = this.sequelize.query(sql, options);
 

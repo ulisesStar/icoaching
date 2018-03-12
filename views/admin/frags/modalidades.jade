@@ -1,0 +1,13 @@
+md-card
+	.md-padding(layout="row" layout-align="space-between center")
+		h4 Modalidades
+		md-button(ng-click="ctrl.crear()" md-colors="{ background : 'green'}")
+			md-icon add
+	md-divider
+	md-list
+		md-list-item(ng-repeat="modalidad in ctrl.modalidades" ui-sref="modalidad ({id: modalidad.id})")
+			.md-list-item-text
+				p {{modalidad.nombre}}
+		md-divider
+			
+				

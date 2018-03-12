@@ -32,9 +32,14 @@ SqliteDialect.prototype.supports = _.merge(_.cloneDeep(AbstractDialect.prototype
     type: true,
     autocommit: false
   },
+  constraints: {
+    addConstraint: false,
+    dropConstraint: false
+  },
   joinTableDependent: false,
   groupedLimit: false,
-  ignoreDuplicates: ' OR IGNORE'
+  ignoreDuplicates: ' OR IGNORE',
+  JSON: true
 });
 
 ConnectionManager.prototype.defaultVersion = '3.8.0';

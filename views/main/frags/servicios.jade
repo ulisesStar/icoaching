@@ -1,0 +1,26 @@
+.servicios(layout="row" layout-align="center center")
+	.servicios-content(flex="80")
+		.filtros
+			md-button.clear(ng-click="ctrl.servicios.limpiar()")
+				md-icon loop
+			md-nav-bar.areas(md-selected-nav-item="ctrl.servicios.filtros.where.IdArea")
+			
+				md-progress-circular(md-mode="indeterminate" md-diameter="40" ng-disabled="ctrl.areas" ng-if="!ctrl.areas")
+				md-nav-item(ng-repeat="area in ctrl.areas" md-nav-click="ctrl.servicios.obtener('Area', area.id)" name="{{area.id}}") {{area.nombre}}
+			
+			md-nav-bar.modalidades(md-selected-nav-item="ctrl.servicios.filtros.where.IdModalidad")
+				
+				md-progress-circular(md-mode="indeterminate" md-diameter="40" ng-disabled="ctrl.modalidades" ng-if="!ctrl.modalidades")
+				md-nav-item(ng-repeat="modalidad in ctrl.modalidades" md-nav-click="ctrl.servicios.obtener('Modalidad', modalidad.id)" name="{{modalidad.id}}") {{modalidad.nombre}}
+			
+			md-nav-bar.tipo(md-selected-nav-item="ctrl.servicios.filtros.where.IdTipo")
+				md-progress-circular(md-mode="indeterminate" md-diameter="40" ng-disabled="ctrl.tipos" ng-if="!ctrl.tipos")
+				md-nav-item(ng-repeat="tipo in ctrl.tipos" md-nav-click="ctrl.servicios.obtener('Tipo', tipo.id)" name="{{tipo.id}}") {{tipo.nombre}}
+						
+		md-progress-linear(md-mode="indeterminate" ng-if="!ctrl.servicios.items" ng-disabled="ctrl.servicios.items")
+		md-grid-list(md-cols="3" md-row-height="300px" style="margin-top:0px" md-gutter="30px" )
+			md-grid-tile(md-colspan="1" md-col md-rowspan="1" ng-repeat="servicio in ctrl.servicios.items")
+				md-card(layout-fill ng-class="")
+					slider(id="servicio.id")
+					md-card-title
+						md-button(ui-sref="servicio({ id : servicio.id })") {{servicio.nombre}}

@@ -3,15 +3,14 @@ extends ../index
 block moreHead
 	script(type="text/javascript" src="js/main/main.states.js")
 	script(type="text/javascript" src="js/main/main.controller.js")
+	link(type="text/css" rel="stylesheet", href="stylus/main.css")
 
 block content
-
-	div(ng-controller="mainCtrl as mainctrl")
-		header
+	.principal(ng-controller="mainCtrl as mainctrl")
+		header(layout="row" layout-align="center center")
 			include ../partials/nav
-		div(layout="row" layout-align="center center")
-			.centro(flex="70" flex-md="90" flex-sm="90" flex-xs="100")
-				main(ui-view="main" class="page")
-		md-divider
+		.centro(layout="row" layout-align="center center")
+			div(flex="100")
+				main.page(ui-view="main")
 		footer(layout="row" layout-align="space-around center")
 			include ../partials/footer

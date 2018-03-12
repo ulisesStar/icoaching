@@ -1,18 +1,8 @@
+var Buffer = require('safe-buffer').Buffer;
 var Iconv = require('iconv-lite');
 
-var NODE_ENCODING = [
-  'ascii',
-  'utf8',
-  'utf16le',
-  'ucs2',
-  'base64',
-  'latin1',
-  'binary',
-  'hex'
-];
-
 exports.decode = function(buffer, encoding, options) {
-  if (NODE_ENCODING[encoding]) {
+  if (Buffer.isEncoding(encoding)) {
     return buffer.toString(encoding);
   }
 
@@ -25,7 +15,7 @@ exports.decode = function(buffer, encoding, options) {
 };
 
 exports.encode = function(string, encoding, options) {
-  if (NODE_ENCODING[encoding]) {
+  if (Buffer.isEncoding(encoding)) {
     return Buffer.from(string, encoding);
   }
 
