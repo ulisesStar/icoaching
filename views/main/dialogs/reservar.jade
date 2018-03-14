@@ -1,0 +1,26 @@
+md-dialog.reserva
+	.botones
+		md-button(ng-click="cerrar()")
+			md-icon clear
+	.content
+		h2 Estas a un paso de fijar 
+			span {{ precio | currency }} pesos
+			|  para {{ evento.nombre }} de {{ servicio.nombre }}
+		form(layoyt="column" name="formulario" ng-submit="crearProspecto(prospecto)")
+			div(layout="row")
+				md-input-container(flex)
+					label Nombre
+					input(ng-model="prospecto.nombre" required)
+				md-input-container(flex)
+					label Apellido
+					input(ng-model="prospecto.apellido" required)
+			md-input-container(flex)
+				label Empresa
+				input(ng-model="prospecto.empresa" required)
+			md-input-container(flex)
+				label Correo
+				input(ng-model="prospecto.correo" required)
+			md-input-container(flex)
+				label Numero telefonico
+				input(ng-model="prospecto.telefono" required)
+			md-button(type="submit" ng-disabled="formulario.$invalid") reservar

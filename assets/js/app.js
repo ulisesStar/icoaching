@@ -19,8 +19,6 @@ var app = angular.module('myapp', [
 // Configuracion
 app.config(function($mdThemingProvider, $analyticsProvider) {
 
-
-
     $mdThemingProvider.definePalette('nuevoVerde', $mdThemingProvider.extendPalette('green', {
       '500': '#41B878',
       'contrastDefaultColor': 'dark'
@@ -201,6 +199,9 @@ app.config(['$provide', function ($provide) {
          date: '@'
        },
        link: function(scope, element) {
+
+		   console.log(scope.date)
+
          var future;
          future = new Date(scope.date);
          $interval(function() {

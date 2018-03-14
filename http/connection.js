@@ -25,9 +25,9 @@ var sequelize = new Sequelize('icoaching', 'root', 'root', {
     }
 });
 
-sequelize.sync()
-.then(() =>  console.log('Connecion realizada'))
-.catch(err =>  console.log('No se puede conectar a la bd:', err))
+// sequelize.sync()
+// .then(() =>  console.log('Connecion realizada'))
+// .catch(err =>  console.log('No se puede conectar a la bd:', err))
 
 module.exports.Sequelize = Sequelize;
 module.exports.sequelize = sequelize;

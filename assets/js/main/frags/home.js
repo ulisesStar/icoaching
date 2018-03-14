@@ -1,6 +1,6 @@
 var app = angular.module('myapp');
 
-app.controller('homeCtrl', function($scope, Modalidad, Area) {
+app.controller('homeCtrl', function($scope, $mdDialog, $analytics,  Modalidad, Area, Prospecto, Evento, Rango, Servicio) {
 
 	// $( ".md-button" ).hover(function() {
 	// 	$( this ).fadeOut( 100 );
@@ -16,8 +16,8 @@ app.controller('homeCtrl', function($scope, Modalidad, Area) {
 	.fromTo($('.main-slider'), 1, { opacity : 0 , ease: Power2.easeIN }, {opacity: 1 }, "-=.2")
 	.from($('.slogan-container'), 1, { x: '100px', opacity : 0 , ease: Power2.easeIN }, "-=.5")
 	.add('loader')
-	.from($('.evento .izquierda'), 1, { width: '0%', opacity : 0 , ease: Power2.easeIN }, 'loader')
-	.from($('.evento .derecha'), 1, { width: '100%', opacity : 0 , ease: Power2.easeIN }, 'loader')
+	// .from($('.evento .izquierda'), 1, { width: '0%', opacity : 0 , ease: Power2.easeIN }, 'loader')
+	// .from($('.evento .derecha'), 1, { width: '100%', opacity : 0 , ease: Power2.easeIN }, 'loader')
 
 	$('.leadership').each(function(){
 
@@ -90,27 +90,37 @@ app.controller('homeCtrl', function($scope, Modalidad, Area) {
 		.addTo(scrollMagicController);
 	});
 
+	Evento.proximo()
+	.then(res => self.evento = res.data)
+	.then(res => self.rangos = Rango.calculo(res))
+	.then(res => self.loader = Rango.precioActual(res))
+	.then(async (res) => self.servicio = await Servicio.evento(self.evento.id).then(res => res.data))
+	.then(() => console.log(self))
+	.then(() => $scope.$digest())
+
 	Modalidad.obtener()
 	.then(res => self.modalidades = res.data)
+	.then(() => $scope.$digest())
+
+	.then(res => console.log())
 	.then(() => $scope.$digest())
 
 	Area.obtener()
 	.then(res => self.areas = res.data)
 	.then(() => $scope.$digest())
 
-	function reAjustarBefore(){
+	function reAjustarBefore() {
 
-		$('.fondo').attr('borderright','50px solid red');
+	    $('.fondo').attr('borderright', '50px solid red');
 
+	    var win = $(".fondo"),
+	        width = win.width()
+	    height = win.height()
 
-		var win = $(".fondo"),
-		width = win.width()
-		height = win.height()
-
-		$(".fondo").css({
-			"border-bottom" : height / 2,
-			"border-top" : height / 2
-		})
+	    $(".fondo").css({
+	        "border-bottom": height / 2,
+	        "border-top": height / 2
+	    })
 
 	}
 
@@ -120,143 +130,207 @@ app.controller('homeCtrl', function($scope, Modalidad, Area) {
 	    lazyCounter = 0;
 
 	// POST commands to YouTube or Vimeo API
-	function postMessageToPlayer(player, command){
-	  if (player == null || command == null) return;
-	  player.contentWindow.postMessage(JSON.stringify(command), "*");
+	function postMessageToPlayer(player, command) {
+	    if (player == null || command == null)
+	        return;
+	    player.contentWindow.postMessage(JSON.stringify(command), "*");
 	}
 
 	// When the slide is changing
-	function playPauseVideo(slick, control){
-	  var currentSlide, slideType, startTime, player, video;
+	function playPauseVideo(slick, control) {
+	    var currentSlide,
+	        slideType,
+	        startTime,
+	        player,
+	        video;
 
-	  currentSlide = slick.find(".slick-current");
-	  slideType = currentSlide.attr("class").split(" ")[1];
-	  player = currentSlide.find("iframe").get(0);
-	  startTime = currentSlide.data("video-start");
+	    currentSlide = slick.find(".slick-current");
+	    slideType = currentSlide.attr("class").split(" ")[1];
+	    player = currentSlide.find("iframe").get(0);
+	    startTime = currentSlide.data("video-start");
 
-	  if (slideType === "vimeo") {
-	    switch (control) {
-	      case "play":
-	        if ((startTime != null && startTime > 0 ) && !currentSlide.hasClass('started')) {
-	          currentSlide.addClass('started');
-	          postMessageToPlayer(player, {
-	            "method": "setCurrentTime",
-	            "value" : startTime
-	          });
+	    if (slideType === "vimeo") {
+	        switch (control) {
+	            case "play":
+	                if ((startTime != null && startTime > 0) && !currentSlide.hasClass('started')) {
+	                    currentSlide.addClass('started');
+	                    postMessageToPlayer(player, {
+	                        "method": "setCurrentTime",
+	                        "value": startTime
+	                    });
+	                }
+	                postMessageToPlayer(player, {
+	                    "method": "play",
+	                    "value": 1
+	                });
+	                break;
+	            case "pause":
+	                postMessageToPlayer(player, {
+	                    "method": "pause",
+	                    "value": 1
+	                });
+	                break;
 	        }
-	        postMessageToPlayer(player, {
-	          "method": "play",
-	          "value" : 1
-	        });
-	        break;
-	      case "pause":
-	        postMessageToPlayer(player, {
-	          "method": "pause",
-	          "value": 1
-	        });
-	        break;
+	    } else if (slideType === "youtube") {
+	        switch (control) {
+	            case "play":
+	                postMessageToPlayer(player, {
+	                    "event": "command",
+	                    "func": "mute"
+	                });
+	                postMessageToPlayer(player, {
+	                    "event": "command",
+	                    "func": "playVideo"
+	                });
+	                break;
+	            case "pause":
+	                postMessageToPlayer(player, {
+	                    "event": "command",
+	                    "func": "pauseVideo"
+	                });
+	                break;
+	        }
+	    } else if (slideType === "video") {
+	        video = currentSlide.children("video").get(0);
+	        if (video != null) {
+	            if (control === "play") {
+	                video.play();
+	            } else {
+	                video.pause();
+	            }
+	        }
 	    }
-	  } else if (slideType === "youtube") {
-	    switch (control) {
-	      case "play":
-	        postMessageToPlayer(player, {
-	          "event": "command",
-	          "func": "mute"
-	        });
-	        postMessageToPlayer(player, {
-	          "event": "command",
-	          "func": "playVideo"
-	        });
-	        break;
-	      case "pause":
-	        postMessageToPlayer(player, {
-	          "event": "command",
-	          "func": "pauseVideo"
-	        });
-	        break;
-	    }
-	  } else if (slideType === "video") {
-	    video = currentSlide.children("video").get(0);
-	    if (video != null) {
-	      if (control === "play"){
-	        video.play();
-	      } else {
-	        video.pause();
-	      }
-	    }
-	  }
 	}
 
 	// Resize player
 	function resizePlayer(iframes, ratio) {
-	  if (!iframes[0]) return;
-	  var win = $(".main-slider"),
-	      width = win.width(),
-	      playerWidth,
-	      height = win.height(),
-	      playerHeight,
-	      ratio = ratio || 16/9;
+	    if (!iframes[0])
+	        return;
+	    var win = $(".main-slider"),
+	        width = win.width(),
+	        playerWidth,
+	        height = win.height(),
+	        playerHeight,
+	        ratio = ratio || 16 / 9;
 
-	  iframes.each(function(){
-	    var current = $(this);
-	    if (width / ratio < height) {
-	      playerWidth = Math.ceil(height * ratio);
-	      current.width(playerWidth).height(height).css({
-	        left: (width - playerWidth) / 2,
-	         top: 0
-	        });
-	    } else {
-	      playerHeight = Math.ceil(width / ratio);
-	      current.width(width).height(playerHeight).css({
-	        left: 0,
-	        top: (height - playerHeight) / 2
-	      });
-	    }
-	  });
+	    iframes.each(function() {
+	        var current = $(this);
+	        if (width / ratio < height) {
+	            playerWidth = Math.ceil(height * ratio);
+	            current.width(playerWidth).height(height).css({
+	                left: (width - playerWidth) / 2,
+	                top: 0
+	            });
+	        } else {
+	            playerHeight = Math.ceil(width / ratio);
+	            current.width(width).height(playerHeight).css({
+	                left: 0,
+	                top: (height - playerHeight) / 2
+	            });
+	        }
+	    });
 	}
 
 	// DOM Ready
 	$(function() {
-	  // Initialize
-	  slideWrapper.on("init", function(slick){
-	    slick = $(slick.currentTarget);
-	    setTimeout(function(){
-	      playPauseVideo(slick,"play");
-	    }, 1000);
-	    resizePlayer(iframes, 16/9);
-	  });
-	  slideWrapper.on("beforeChange", function(event, slick) {
-	    slick = $(slick.$slider);
-	    playPauseVideo(slick,"pause");
-	  });
-	  slideWrapper.on("afterChange", function(event, slick) {
-	    slick = $(slick.$slider);
-	    playPauseVideo(slick,"play");
-	  });
-	  slideWrapper.on("lazyLoaded", function(event, slick, image, imageSource) {
-	    lazyCounter++;
-	    if (lazyCounter === lazyImages.length){
-	      lazyImages.addClass('show');
-	      // slideWrapper.slick("slickPlay");
-	    }
-	  });
+	    // Initialize
+	    slideWrapper.on("init", function(slick) {
+	        slick = $(slick.currentTarget);
+	        setTimeout(function() {
+	            playPauseVideo(slick, "play");
+	        }, 1000);
+	        resizePlayer(iframes, 16 / 9);
+	    });
+	    slideWrapper.on("beforeChange", function(event, slick) {
+	        slick = $(slick.$slider);
+	        playPauseVideo(slick, "pause");
+	    });
+	    slideWrapper.on("afterChange", function(event, slick) {
+	        slick = $(slick.$slider);
+	        playPauseVideo(slick, "play");
+	    });
+	    slideWrapper.on("lazyLoaded", function(event, slick, image, imageSource) {
+	        lazyCounter++;
+	        if (lazyCounter === lazyImages.length) {
+	            lazyImages.addClass('show');
+	            // slideWrapper.slick("slickPlay");
+	        }
+    });
 
-	  //start the slider
-	  slideWrapper.slick({
-	    // fade:true,
-	    autoplaySpeed:4000,
-	    lazyLoad:"progressive",
-	    speed:600,
-	    arrows:false,
-	    dots:true,
-	    cssEase:"cubic-bezier(0.87, 0.03, 0.41, 0.9)"
-	  });
+    //start the slider
+    slideWrapper.slick({
+	        // fade:true,
+	        autoplaySpeed: 4000,
+	        lazyLoad: "progressive",
+	        speed: 600,
+	        arrows: false,
+	        dots: true,
+	        cssEase: "cubic-bezier(0.87, 0.03, 0.41, 0.9)"
+	    });
 	});
 
 	// Resize event
-	$(window).on("resize.slickVideoPlayer", function(){
-		resizePlayer(iframes, 16/9);
-		reAjustarBefore()
+	$(window).on("resize.slickVideoPlayer", function() {
+	    resizePlayer(iframes, 16 / 9);
+	    reAjustarBefore()
 	});
+
+	self.reservar = () => {
+
+		$analytics.eventTrack('reservación', {  category: 'intento', label: 'reservacion' });
+
+		$mdDialog.show({
+			templateUrl: '/dialogsmain/reservar',
+			clickOutsideToClose: true,
+			fullscreen: true,
+			locals : {
+				evento : self.evento,
+				loader : self.loader
+			},
+			controllerAs : 'ctrl',
+			controller: ($scope, $mdDialog, $analytics, Prospecto, evento, loader, Servicio)  => {
+
+				var self = this;
+
+				$scope.precio = loader.precio
+				$scope.evento = evento
+
+				Servicio.evento(evento.id)
+				.then(res => $scope.servicio = res.data)
+
+				$scope.cerrar = () => {
+					console.log('si estoy funcionando')
+					$mdDialog.hide()
+				}
+
+				$scope.crearProspecto = (prospecto) => {
+
+					$analytics.eventTrack('prospecto', {  category: 'prospecto', label: 'reservacion' });
+
+					Prospecto.reservar( new Object( {
+						prospecto : prospecto,
+						precio : loader.precio,
+						evento : evento.id
+					} ) )
+					.then(res => $mdDialog.hide(res))
+				}
+
+			}
+		}).then(data => {
+			$mdDialog.show($mdDialog.alert().title('Gracias').content('Tu numero de reservación es ' + data.data[0][0].numero).ok('Close') ).finally(() => {})
+		})
+
+	}
+
+	self.crearProspecto = (prospecto) => {
+
+		$analytics.eventTrack('prospecto', {  category: 'prospecto', label: 'contacto' });
+
+		Prospecto.crear(prospecto)
+		.then(res => self.prospecto = res.data)
+
+	}
+
+	console.log(self)
 
 });

@@ -39,6 +39,7 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
 	.state('servicio', template('admin', ['servicio'], '/servicio/:id'))
 	.state('modalidades', template('admin', ['modalidades'], '/modalidades'))
 	.state('modalidad', template('admin', ['modalidad'], '/modalidad/:id'))
+	.state('eventos', template('admin', ['eventos'], '/eventos'))
 	.state('evento', template('admin', ['evento'], '/evento/:id'))
 
 

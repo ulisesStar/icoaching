@@ -1,0 +1,13 @@
+.eventos
+	md-card
+		md-subheader Eventos
+		md-divider
+		md-list
+			md-list-item(ng-repeat="evento in ctrl.eventos.items" ui-sref="evento({id : evento.id})")
+				md-icon(style="margin: 0px 20px" md-colors="evento.status === 1 ? {color: 'green'} : {color : 'red'}") lens
+				.md-list-item-text
+					p {{evento.nombre}}
+				.md-secondary
+					p {{evento.fechainicial | date }} - {{evento.fechafinal | date }}
+					p(ng-bind="evento.diasFaltantes()")
+				md-divider

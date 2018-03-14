@@ -23,7 +23,7 @@ var lessMiddleware = require('less-middleware')
 app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "jade");
 
-app.use(favicon(path.join(__dirname, 'assets', 'favicon.ico')))
+app.use(favicon(path.join(__dirname, 'assets', 'icoaching.ico')))
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: false }));
 app.use(cookieParser());
@@ -40,6 +40,7 @@ app.use('/', require('./http/routes/routeTipo'));
 app.use('/', require('./http/routes/routeModalidad'));
 app.use('/', require('./http/routes/routeEvento'));
 app.use('/', require('./http/routes/routeServicio'));
+app.use('/', require('./http/routes/routeProspecto'));
 
 app.use(session({secret: '01f4845/564564/6@@fas588--[[}++', resave: true, saveUninitialized: true}));
 

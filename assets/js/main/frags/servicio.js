@@ -1,6 +1,6 @@
 var app = angular.module('myapp');
 
-app.controller('servicioCtrl', function($scope, $stateParams, Servicio, Imagen, Area, Modalidad, Tipo) {
+app.controller('servicioCtrl', function($scope, $stateParams, $analytics, Servicio, Imagen, Area, Modalidad, Tipo, Prospecto) {
 
 	var self = this;
 
@@ -60,7 +60,6 @@ app.controller('servicioCtrl', function($scope, $stateParams, Servicio, Imagen, 
 	})
 	.then(() => $scope.$digest())
 
-
 	Imagen.servicio(id)
 	.then(res => self.servicio.imagenes = res.data)
 	.then(() => $scope.$digest())
@@ -94,7 +93,11 @@ app.controller('servicioCtrl', function($scope, $stateParams, Servicio, Imagen, 
 		}
 	}
 
-	console.log(self)
+	$scope.crearProspecto = (prospecto) => {
+		$analytics.eventTrack('prospecto', {  category: 'prospecto', label: 'servicio' });
 
+		Prospecto.crear(prospecto)
+		.then(res => $mdDialog.hide(res))
+	}
 
 });

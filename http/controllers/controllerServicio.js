@@ -1,5 +1,5 @@
 var db = require('../relations');
-var {servicio, tipo, area, modalidad } = db;
+var {servicio, tipo, area, modalidad, evento } = db;
 
 var ex = module.exports = {};
 
@@ -45,4 +45,21 @@ ex.read = function(req, res, next) {
 		})
         .then(result => res.status(200).jsonp(result))
     }
+};
+
+
+ex.filtro = function(req, res, next) {
+
+    servicio.findAll(req.body)
+    .then(result => res.status(200).jsonp(result))
+
+};
+
+
+ex.servicioXevento = function(req, res, next) {
+
+    evento.findById(req.params.id)
+    .then(eventito => eventito.getServicio())
+    .then(result => res.status(200).jsonp(result))
+
 };

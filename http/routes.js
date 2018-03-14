@@ -17,6 +17,10 @@ router.get("/partialmain/:url", function(req, res) {
     res.render("main/partials/" + req.params.url);
 })
 
+router.get("/dialogsmain/:url", function(req, res) {
+    res.render("main/dialogs/" + req.params.url);
+})
+
 router.get("/user", function(req, res) {
     res.render("user/layout");
 })

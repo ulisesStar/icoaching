@@ -1,6 +1,6 @@
 var app = angular.module('myapp');
 
-app.controller('eventoCtrl', function($scope, $stateParams, Evento, Imagen, $filter) {
+app.controller('eventoCtrl', function($scope, $stateParams, Evento, Imagen, $filter, Rango) {
 
 
     var self = this
@@ -10,15 +10,12 @@ app.controller('eventoCtrl', function($scope, $stateParams, Evento, Imagen, $fil
     const informacion = {
         bindto: '#grafica',
         data: {
-            x: 'x',
-            columns: [
-                ['x'],
-                ['data1']
-            ],
-                types: {
-                   x: 'area',
-                   historia: 'area-spline'
-               }
+            x: 'fechas',
+            columns: [],
+            types: {
+               x: 'area',
+               historia: 'area-spline'
+           }
         },
         axis: {
             x: {
@@ -29,17 +26,6 @@ app.controller('eventoCtrl', function($scope, $stateParams, Evento, Imagen, $fil
                 }
             }
         }
-    }
-
-
-
-    self.refresh = () => {
-
-        grafica.load({
-                columns: [
-                    ['data1', 230, 190, 300, 500, 300, 400]
-                ]
-            });
     }
 
     class evento_ {
@@ -57,18 +43,29 @@ app.controller('eventoCtrl', function($scope, $stateParams, Evento, Imagen, $fil
 
         obtenerRango(){
 
-            var itr = moment.twix(
-                    new Date( moment(this.fechainicial).format("YYYY-MM-DD")),
-                    new Date( moment(this.fechafinal).format("YYYY-MM-DD") )
-                ).iterate("days")
+            Rango.calculo(this)
+            .then(response => {
+                informacion.data.columns = Object.entries(response).map(n => _.flatten(n))
+            })
+            .then(response => {
 
-            while(itr.hasNext()){
-                informacion.data.columns[0].push( moment(itr.next().toDate()).format("YYYY-MM-DD") )
-                informacion.data.columns[1].push( 100 )
-            }
+                console.log(response)
+                const grafica = c3.generate(informacion)
+            })
+            .then(() => {
+                self.hoy = moment(new Date).format("YYYY-MM-DD")
+                let idx = informacion.data.columns[0].findIndex(n => n === _.toString(self.hoy) )
+                self.precioactual = informacion.data.columns[1][idx]
 
-            console.log(informacion)
-            const grafica = c3.generate(informacion)
+                console.log(informacion)
+
+            })
+        }
+
+        guardar(){
+
+            Evento.guardar(this)
+            .then(res => console.log(res))
 
         }
     }
@@ -117,7 +114,5 @@ app.controller('eventoCtrl', function($scope, $stateParams, Evento, Imagen, $fil
         }).then(res => self.evento.imagenes.push(res.data))
 
 	}
-
-    console.log(self)
 
 });

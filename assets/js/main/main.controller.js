@@ -2,10 +2,10 @@ app.controller('mainCtrl', function ($scope) {
 
 	$scope.map = {
         center: {
-            latitude: 19.393664,
-            longitude: -99.1745978
+            latitude: 20.6735287,
+            longitude: -103.3897222,
         },
-        zoom: 13
+        zoom: 15
     };
 
     $scope.markeroptions = {
@@ -15,8 +15,8 @@ app.controller('mainCtrl', function ($scope) {
     $scope.markers = [
         {
             coordenadas: {
-                latitude: 19.393664,
-                longitude: -99.1745978,
+                latitude: 20.6735287,
+                longitude: -103.3897222,
             }
         }
     ];

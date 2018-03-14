@@ -17,17 +17,21 @@
 				h3 Descripcion
 				p(ng-bind-html="ctrl.servicio.descripcion")
 		.prospecto(flex style="background-color : {{ctrl.area.color }}   ")
-			form(layout="column" ng-submit="crearProspecto()" )
-				md-input-container
-					label Nombre
-					input
+			form(layout="column" name="formulario" ng-submit="crearProspecto(prospecto)" )
+				div(layout="row")
+					md-input-container(flex)
+						label Nombre
+						input(ng-model="prospecto.nombre")
+					md-input-container(flex)
+						label Nombre
+						input(ng-model="prospecto.apellido")
 				md-input-container
 					label Telefono
-					input
+					input(ng-model="prospecto.telefono")
 				md-input-container
 					label Correo
-					input
-				md-button(type="submit")
+					input(ng-model="prospecto.correo")
+				md-button(type="submit" ng-disabled="formulario.$invalid")
 					md-icon done
 				
 			

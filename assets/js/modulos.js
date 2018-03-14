@@ -19,6 +19,7 @@ app.config(['$ocLazyLoadProvider', function ($ocLazyLoadProvider) {
 			template('admin', 'modalidades'),
 			template('admin', 'servicio'),
 			template('admin', 'servicios'),
+			template('admin', 'eventos'),
 			template('admin', 'evento')
         ]
 

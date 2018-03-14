@@ -19,6 +19,10 @@ app.controller('adminCtrl', function($scope, $rootScope, $http, mdDialog, $timeo
             icon: 'star',
             nombre: 'servicios',
             state: 'servicios'
+        }, {
+            icon: 'event',
+            nombre: 'eventos',
+            state: 'eventos'
         }
     ];
 

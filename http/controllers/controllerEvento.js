@@ -1,3 +1,5 @@
+var moment = require('moment');
+
 var db = require('../relations');
 var {servicio , evento} = db;
 
@@ -47,6 +49,32 @@ ex.eventoXservicio = function(req, res, next) {
 
     servicio.findById(req.params.id)
     .then(servicio => servicio.getEvento())
+    .then(result => res.status(200).jsonp(result))
+
+};
+
+
+ex.proximo = function(req, res, next) {
+
+    const rango = (fecha) => {
+        return moment(fecha).diff(moment(new Date), 'days')
+    }
+
+    const cercano = (array) => {
+        return new Promise((resolve, reject) => {
+            resolve(
+                array.reduce((ac, v ) => ac = rango(ac.fechafinal) > rango(v.fechafinal) ? v : ac,
+                    {fechafinal : new Date('3000-01-01 01:52:18')}
+                )
+            )
+        })
+    }
+
+    evento.findAll({
+        where :
+            { status : 1 }
+    })
+    .then(result => cercano(result))
     .then(result => res.status(200).jsonp(result))
 
 };

@@ -11,6 +11,8 @@ var modalidad = require('./db/modeloModalidad')(conector);
 var servicio = require('./db/modeloServicio')(conector);
 var evento = require('./db/modeloEvento')(conector);
 var tipo = require('./db/modeloTipo')(conector);
+var prospecto = require('./db/modeloProspecto')(conector);
+var reservacion = require('./db/modeloReservacion')(conector);
 
 //- Relations
 
@@ -29,12 +31,8 @@ servicio.hasMany(evento, {as:'Evento', foreignKey: 'IdServicio'});
 imagenes.belongsTo(evento, {as:'Evento', foreignKey: 'IdEvento'});
 evento.hasMany(imagenes, {as:'Imagen', foreignKey: 'IdEvento'});
 
-// servicios.hasMany(imagenes, {foreignKey: 'IdServicio'});
-// imagenes.belongsTo(servicios, {foreignKey: 'IdServicio'});
-//
-// foto.belongsTo(abogados, {foreignKey: 'IdAbogado'});
-// abogados.hasOne(foto, {foreignKey: 'IdAbogado'});
-
+prospecto.belongsToMany(evento, {as:'Evento',  through: reservacion,  foreignKey: 'IdProspecto'});
+evento.belongsToMany(prospecto, {as:'Prospecto',  through: reservacion,  foreignKey: 'IdEvento'});
 
 module.exports.usuario = usuario;
 module.exports.imagenes = imagenes;
@@ -43,3 +41,5 @@ module.exports.area = area;
 module.exports.modalidad = modalidad;
 module.exports.servicio = servicio;
 module.exports.evento = evento;
+module.exports.prospecto = prospecto;
+module.exports.reservacion = reservacion;

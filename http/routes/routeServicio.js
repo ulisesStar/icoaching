@@ -15,4 +15,7 @@ route.route('/data/servicio/:id')
         .put(x.update)
         .delete(x.delete);
 
+route.route('/data/servicioXevento/:id')
+        .get(x.servicioXevento)
+
 module.exports = route;

@@ -15,4 +15,7 @@ route.route('/data/evento/:id')
 route.route('/data/eventoXservicio/:id')
         .get(x.eventoXservicio)
 
+route.route('/data/eventoproximo')
+        .get(x.proximo)
+
 module.exports = route;

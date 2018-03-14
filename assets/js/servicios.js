@@ -36,7 +36,10 @@ app.service('Evento', function() {
 
     this.crear = (evento) => axios.post('/data/evento', evento )
 	this.one = (id) => axios('/data/evento/' + id )
+    this.guardar = (evento) => axios.put('/data/evento/' + evento.id, evento )
+    this.obtener = () => axios('/data/evento' )
     this.servicio = (id) => axios('/data/eventoXservicio/' + id)
+    this.proximo = () => axios('/data/eventoproximo')
 
 });
 
@@ -45,6 +48,7 @@ app.service('Servicio', function() {
     this.one = (id) => axios('/data/servicio/' + id )
     this.crear = (servicio) => axios.post('/data/servicio', servicio )
 	this.obtener = () => axios('/data/servicio' )
+	this.evento = (id) => axios('/data/servicioXevento/' + id)
 	this.filtro = (filtros) => axios.post('/data/servicio/filtro', filtros)
 	this.guardar = (servicio) => axios.put('/data/servicio/' + servicio.id, servicio )
 
@@ -56,5 +60,13 @@ app.service('Imagen', function() {
     this.one = (id) => axios('/data/imagen/' + id)
     this.evento = (id) => axios('/data/imagenXevento/' + id)
 	this.servicio = (id) => axios('/data/imagenXservicio/' + id)
+
+});
+
+
+app.service('Prospecto', function() {
+
+    this.crear = (prospecto) => axios.post('/data/prospecto', prospecto )
+	this.reservar = (prospecto) => axios.post('/data/reservar', prospecto )
 
 });

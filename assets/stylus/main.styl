@@ -12,10 +12,16 @@ rosaObscuro = #87205c
 mobile = "(max-width: 600px)"
 compu = "(min-width: 600px)"
 
+
 @font-face
-	font-family Poppins
+	font-family Futura
 	font-weight 800
-	src url('../fonts/Poppins-Bold.ttf')
+	src url('../fonts/Futura-Book-Bold.ttf')
+
+@font-face
+	font-family Futura
+	font-weight 800
+	src url('../fonts/Futura-Bold.ttf')
 
 transition(duracion, delay)
 	-webkit-transition all duracion cubic-bezier(0.445, 0.050, 0.550, 0.950)
@@ -82,31 +88,49 @@ main
 						flex 2
 						align-items start
 						p
-							font-family helvetica
+							font-family Futura
 							font-size 66px
 							color verdeClaro
 							text-transform uppercase
 							letter-spacing -7px
 						h3
-							font-family helvetica
+							font-family Futura
 							font-weight bold
-							font-size: 88px
+							font-size: 76px
 							margin 0px
 							line-height 72px
-							letter-spacing -10px
+							letter-spacing -5px
 					.fecha-container
 						flex 1
 						display flex
 						justify-content center
 						p
 							margin 0px
+						.proximo
+							display flex
+							justify-content center
+							flex-direction column
+							margin 25px 0
+							&>div
+								text-align center
+							.evento
+								font-size 24px
+							.servicio
+								font-size 40px
+								line-height 33px
+								font-family Futura
 						strong
-							font-size 60px
+							font-size 40px
 							line-height 1
 						span
-							font-size 30px
+							font-size 23px
 							letter-spacing -2px
 							text-transform uppercase
+							background-color white
+							color verde
+							padding 5px 20px
+							margin 5px 0
+							border-radius 50px
 
 				.evento-container
 					margin 40px 0
@@ -124,6 +148,7 @@ main
 							text-align center
 					.evento
 						flex 1
+						overflow hidden
 						background-color rgba(255, 255, 255, .5)
 						border-radius 50px
 						height 40px
@@ -131,6 +156,16 @@ main
 						display flex
 						justify-content center
 						flex-direction row
+						position relative
+						.precioactual
+							z-index 1
+							display flex
+							justify-content center
+							position absolute
+							width 100%
+							height calc(100% -  10px)
+							strong
+								font-size 30px
 						.izquierda
 							border-radius 50px 0 0 50px
 							background-color white
@@ -139,6 +174,15 @@ main
 							border-radius 0 50px 50px 0
 							background-color rgba(255, 255, 255, .5)
 							flex-grow 1
+							overflow hidden
+							md-progress-linear
+								height 100%
+								.md-container
+									height 100%
+									&>div
+										height 100%
+									.md-bar
+										opacity .5
 				.botones
 					display flex
 					justify-content center
@@ -242,7 +286,7 @@ main
 					align-items center
 					background-repeat no-repeat
 					.titulo
-						font-family Poppins
+						font-family Futura
 						font-weight 800
 						color white
 						font-size 8vw
@@ -282,12 +326,12 @@ main
 		&.formulario
 			height 100vh
 			h2
-				font-family Poppins
+				font-family Futura
 				font-size 5vw
 				line-height 5vw
 				margin 0px
 			h4
-				font-family Poppins
+				font-family Futura
 				font-size 3vw
 				line-height 3vw
 				color verde
@@ -412,7 +456,7 @@ main
 			justify-content center
 			align-items center
 			h2
-				font-family Poppins
+				font-family Futura
 				font-weight 800
 				color white
 				font-size 3vw
@@ -507,3 +551,45 @@ footer
 					.angular-google-map-container
 						height 300px
 						width 100%
+
+.md-dialog-container
+	position absolute
+	z-index 9999
+	md-dialog.reserva
+		width 100vw
+		height 100vh
+		max-height inherit
+		max-width inherit
+		z-index 1000
+		display flex
+		flex-direction column
+		.botones
+			height 50px
+			display flex
+			flex-direction row
+			justify-content flex-end
+		.content
+			height calc(100vh - 50px)
+			display flex
+			justify-content center
+			align-items center
+			display flex
+			flex-direction column
+			h2
+				width 80vw
+				font-family Futura
+				font-size 40px
+				line-height 40px
+				margin 0px
+				letter-spacing 1px
+				span
+					color verdeClaro
+			form
+				display flex
+				flex-direction column
+				width 80vw
+				margin 3vw 0
+				.md-button
+					background-color verdeClaro
+					height 60px
+					color white

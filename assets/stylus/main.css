@@ -1,7 +1,12 @@
 @font-face {
-  font-family: Poppins;
+  font-family: Futura;
   font-weight: 800;
-  src: url("../fonts/Poppins-Bold.ttf");
+  src: url("../fonts/Futura-Book-Bold.ttf");
+}
+@font-face {
+  font-family: Futura;
+  font-weight: 800;
+  src: url("../fonts/Futura-Bold.ttf");
 }
 header {
   position: fixed;
@@ -59,19 +64,19 @@ main {
   align-items: start;
 }
 .home section.principal .section-content .contenido .slogan-container p {
-  font-family: helvetica;
+  font-family: Futura;
   font-size: 66px;
   color: #abe774;
   text-transform: uppercase;
   letter-spacing: -7px;
 }
 .home section.principal .section-content .contenido .slogan-container h3 {
-  font-family: helvetica;
+  font-family: Futura;
   font-weight: bold;
-  font-size: 88px;
+  font-size: 76px;
   margin: 0px;
   line-height: 72px;
-  letter-spacing: -10px;
+  letter-spacing: -5px;
 }
 .home section.principal .section-content .contenido .fecha-container {
   flex: 1;
@@ -81,14 +86,36 @@ main {
 .home section.principal .section-content .contenido .fecha-container p {
   margin: 0px;
 }
+.home section.principal .section-content .contenido .fecha-container .proximo {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: 25px 0;
+}
+.home section.principal .section-content .contenido .fecha-container .proximo>div {
+  text-align: center;
+}
+.home section.principal .section-content .contenido .fecha-container .proximo .evento {
+  font-size: 24px;
+}
+.home section.principal .section-content .contenido .fecha-container .proximo .servicio {
+  font-size: 40px;
+  line-height: 33px;
+  font-family: Futura;
+}
 .home section.principal .section-content .contenido .fecha-container strong {
-  font-size: 60px;
+  font-size: 40px;
   line-height: 1;
 }
 .home section.principal .section-content .contenido .fecha-container span {
-  font-size: 30px;
+  font-size: 23px;
   letter-spacing: -2px;
   text-transform: uppercase;
+  background-color: #fff;
+  color: #41b878;
+  padding: 5px 20px;
+  margin: 5px 0;
+  border-radius: 50px;
 }
 .home section.principal .section-content .evento-container {
   margin: 40px 0;
@@ -110,6 +137,7 @@ main {
 }
 .home section.principal .section-content .evento-container .evento {
   flex: 1;
+  overflow: hidden;
   background-color: rgba(255,255,255,0.5);
   border-radius: 50px;
   height: 40px;
@@ -117,6 +145,18 @@ main {
   display: flex;
   justify-content: center;
   flex-direction: row;
+  position: relative;
+}
+.home section.principal .section-content .evento-container .evento .precioactual {
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 10px);
+}
+.home section.principal .section-content .evento-container .evento .precioactual strong {
+  font-size: 30px;
 }
 .home section.principal .section-content .evento-container .evento .izquierda {
   border-radius: 50px 0 0 50px;
@@ -127,6 +167,19 @@ main {
   border-radius: 0 50px 50px 0;
   background-color: rgba(255,255,255,0.5);
   flex-grow: 1;
+  overflow: hidden;
+}
+.home section.principal .section-content .evento-container .evento .derecha md-progress-linear {
+  height: 100%;
+}
+.home section.principal .section-content .evento-container .evento .derecha md-progress-linear .md-container {
+  height: 100%;
+}
+.home section.principal .section-content .evento-container .evento .derecha md-progress-linear .md-container>div {
+  height: 100%;
+}
+.home section.principal .section-content .evento-container .evento .derecha md-progress-linear .md-container .md-bar {
+  opacity: 0.5;
 }
 .home section.principal .section-content .botones {
   display: flex;
@@ -258,7 +311,7 @@ main {
 }
 .home section.leadership .content .imagen .titulo,
 .home section.bilateral .content .imagen .titulo {
-  font-family: Poppins;
+  font-family: Futura;
   font-weight: 800;
   color: #fff;
   font-size: 8vw;
@@ -307,13 +360,13 @@ main {
   height: 100vh;
 }
 .home section.formulario h2 {
-  font-family: Poppins;
+  font-family: Futura;
   font-size: 5vw;
   line-height: 5vw;
   margin: 0px;
 }
 .home section.formulario h4 {
-  font-family: Poppins;
+  font-family: Futura;
   font-size: 3vw;
   line-height: 3vw;
   color: #41b878;
@@ -474,7 +527,7 @@ main {
   align-items: center;
 }
 .servicio .imagenes .titulo h2 {
-  font-family: Poppins;
+  font-family: Futura;
   font-weight: 800;
   color: #fff;
   font-size: 3vw;
@@ -593,4 +646,53 @@ footer .footer-content .mapa ui-gmap-google-map .angular-google-map {
 footer .footer-content .mapa ui-gmap-google-map .angular-google-map .angular-google-map-container {
   height: 300px;
   width: 100%;
+}
+.md-dialog-container {
+  position: absolute;
+  z-index: 9999;
+}
+.md-dialog-container md-dialog.reserva {
+  width: 100vw;
+  height: 100vh;
+  max-height: inherit;
+  max-width: inherit;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+.md-dialog-container md-dialog.reserva .botones {
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+.md-dialog-container md-dialog.reserva .content {
+  height: calc(100vh - 50px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+.md-dialog-container md-dialog.reserva .content h2 {
+  width: 80vw;
+  font-family: Futura;
+  font-size: 40px;
+  line-height: 40px;
+  margin: 0px;
+  letter-spacing: 1px;
+}
+.md-dialog-container md-dialog.reserva .content h2 span {
+  color: #abe774;
+}
+.md-dialog-container md-dialog.reserva .content form {
+  display: flex;
+  flex-direction: column;
+  width: 80vw;
+  margin: 3vw 0;
+}
+.md-dialog-container md-dialog.reserva .content form .md-button {
+  background-color: #abe774;
+  height: 60px;
+  color: #fff;
 }

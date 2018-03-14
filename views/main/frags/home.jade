@@ -7,21 +7,27 @@
 					h3 MÁS FÁCIL CON ICOACH
 				.fecha-container
 					p Proximo curso
-					strong 14 Abril
-					span(countdown='' date='2017-11-15 15:27:35')
+					.proximo
+						.evento {{ctrl.evento.nombre}} de
+						.servicio {{ctrl.servicio.nombre}}
+					strong {{ctrl.evento.fechafinal | date }}
+					span(countdown='' date="{{ctrl.evento.fechafinal | date : 'yyyy-MM-dd HH:mm:ss' }}" ng-if="ctrl.evento")
 			.evento-container
 				.precio
-					strong $2,000
+					strong {{ctrl.evento.precioinicial | currency}}
 					p Precio inicial
 				.evento
-					.izquierda
-					.derecha
+					.precioactual
+						strong {{ctrl.loader.precio | currency}}
+					.izquierda(style="flex-grow : {{ctrl.loader.izquierda}}")
+					.derecha(style="flex-grow : {{ctrl.loader.derecha}}")
+						md-progress-linear(md-mode="indeterminate")
 				.precio
-					strong $2,000
-					p Precio inicial
+					strong {{ctrl.evento.preciofinal | currency}}
+					p Precio final
 			.botones
-				md-button.md-raised Reserva
-				span Aparta tu lugar y sin compromiso
+				md-button.md-raised(ng-click="ctrl.reservar()") Reserva
+				span Aparta tu lugar y fija el precio sin compromiso
 			
 	section.principal(layout="row")
 		.main-slider(flex="60")
@@ -39,17 +45,17 @@
 			//- 		.slide-image.slide-media(style="background-image:url('https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLNXBIcEdOUFVIWmM');")
 			//- 			img.image-entity(data-lazy='https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLNXBIcEdOUFVIWmM')
 			//- 		//-  figcaption.caption Static Image
-			//- .item.youtube
-			//- 	iframe.embed-player.slide-media(width='980', height='520', src='https://www.youtube.com/embed/tdwbYGe8pv8?enablejsapi=1&controls=0&fs=0&iv_load_policy=3&rel=0&showinfo=0&loop=1&playlist=tdwbYGe8pv8&start=102', frameborder='0', allowfullscreen='')
-			//- 	//-  p.caption YouTube
+			.item.youtube
+				iframe.embed-player.slide-media(width='980', height='520', src='https://www.youtube.com/embed/eOl8H4Yj2WI?enablejsapi=1&controls=0&fs=0&iv_load_policy=3&rel=0&showinfo=0&loop=1&playlist=tdwbYGe8pv8&start=0', frameborder='0', allowfullscreen='')
+				//-  p.caption YouTube
 			//- .item.image
 			//- 	figure
 			//- 		.slide-image.slide-media(style="background-image:url('https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLSlBkWDBsWXJNazQ');")
 			//- 			img.image-entity(data-lazy='https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLSlBkWDBsWXJNazQ')
 			//- 		//-  figcaption.caption Static Image
-			.item.video
-				video.slide-video.slide-media(loop='', muted='', preload='metadata', poster='https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLSXZCakVGZWhOV00')
-					source(src='https://player.vimeo.com/external/138504815.sd.mp4?s=8a71ff38f08ec81efe50d35915afd426765a7526&profile_id=112', type='video/mp4')
+			//- .item.video
+			//- 	video.slide-video.slide-media(loop='', muted='', preload='metadata', poster='https://drive.google.com/uc?export=view&id=0B_koKn2rKOkLSXZCakVGZWhOV00')
+			//- 		source(src='https://player.vimeo.com/external/138504815.sd.mp4?s=8a71ff38f08ec81efe50d35915afd426765a7526&profile_id=112', type='video/mp4')
 				//-  p.caption HTML 5 Video
 		.fondo(flex="40")
 	section.intro-container(layout="row" layout-align="center start")
@@ -86,29 +92,31 @@
 				.descripcion(ng-bind-html="ctrl.areas[1].descripcion")
 				md-button(ui-sref="servicios({IdArea: 2})") Más información
 	section.formulario(layout="row" layout-align="center center")
-		.formulario-content(flex="60")
+		.formulario-content(ng-if="ctrl.prospecto")
+			h2 Muchas gracias {{ctrl.prospecto.nombre}}
+		.formulario-content(flex="60" ng-if="!ctrl.prospecto")
 			h2 Solicita una sesión de coaching
 			h4 Sin costo
-			form(layout="column" ng-submit="crearProspecto()" )
+			form(layout="column" name="formulario" ng-submit="ctrl.crearProspecto(prospecto)" )
 				div(layout="row")
 					md-input-container(flex)
 						label Nombre
-						input
+						input(ng-model="prospecto.nombre" required)
 					md-input-container(flex)
 						label Apellido
-						input
+						input(ng-model="prospecto.apellido" required)
 				div(layout="row")
 					md-input-container(flex)
 						label Compañia
-						input
+						input(ng-model="prospecto.empresa" required)
 					md-input-container(flex)
 						label Tefono
-						input
+						input(ng-model="prospecto.telefono" required)
 					md-input-container(flex)
 						label Correo
-						input
+						input(ng-model="prospecto.correo" required)
 				div(layout="row" layout-align="start center")
-					md-button(type="submit") Enviar formulario
+					md-button(type="submit" ng-disabled="formulario.$invalid") Enviar formulario
 						md-icon keyboard_arrow_right
 						
 				
