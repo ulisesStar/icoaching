@@ -366,6 +366,7 @@ main {
   padding: 10px;
   cursor: pointer;
   max-width: 400px;
+  min-height: 260px;
 }
 .home section.modalidades .modalidades-content .modalidad.conHover {
   transform: scale(0.9);
@@ -424,11 +425,6 @@ main {
 @media (max-width: 600px) {
   .home section.modalidades .modalidades-content .modalidad .descripcion p {
     font-size: 11px;
-  }
-}
-@media (min-width: 600px) {
-  .home section.modalidades .modalidades-content .modalidad .descripcion p {
-    font-size: 25px;
   }
 }
 .home section.leadership,
