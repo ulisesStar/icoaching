@@ -16,7 +16,13 @@ compu = "(min-width: 600px)"
 @font-face
 	font-family Futura
 	font-weight 800
-	src url('../fonts/FuturaBookBold.ttf')
+	src url('../fonts/FuturaBookBold.ttf') , url('../fonts/FuturaBookBT.ttf')
+
+@font-face
+	font-family Gothic
+	font-weight 800
+	src url('../fonts/GOTHIC.TTF')
+
 
 transition(duracion, delay)
 	-webkit-transition all duracion cubic-bezier(0.445, 0.050, 0.550, 0.950)
@@ -32,6 +38,8 @@ animation(animation, duration = 1s)
 	-o-transition all duration ease-in-out
 	transition all duration ease-in-out
 
+*
+	font-family Gothic
 
 header
 	position fixed
@@ -66,11 +74,20 @@ main
 				align-items center
 				z-index 99
 				position absolute
+			.main-slider
+				@media mobile
+					display none
+			.fondo
+				@media mobile
+					max-width 100%
 			.section-content
 				width 80vw
 				.contenido
 					display flex
 					flex-direction row
+					@media mobile
+						flex-direction column
+						height 250px
 					&>div
 
 						color white
@@ -84,19 +101,34 @@ main
 						align-items start
 						p
 							font-family Futura
-							font-size 66px
 							color verdeClaro
 							text-transform uppercase
-							letter-spacing -7px
+							@media mobile
+								font-size 25px
+								letter-spacing 0px
+							@media compu
+								font-size 66px
+								letter-spacing -7px
+
 						h3
 							font-family Futura
 							font-weight bold
-							font-size: 76px
 							margin 0px
-							line-height 72px
-							letter-spacing -5px
+
+
+							@media mobile
+								font-size 24px
+								letter-spacing -1px
+							@media compu
+								font-size 76px
+								line-height 72px
+								letter-spacing -5px
 					.fecha-container
-						flex 1
+
+						@media compu
+							flex 1
+						@media mobile
+							flex 4
 						display flex
 						justify-content center
 						p
@@ -109,23 +141,39 @@ main
 							&>div
 								text-align center
 							.evento
-								font-size 24px
+								@media mobile
+									font-size 11px
+								@media compu
+									font-size 24px
+
 							.servicio
-								font-size 40px
 								line-height 33px
 								font-family Futura
+								@media mobile
+									font-size 25px
+								@media compu
+									font-size 40px
+
 						strong
-							font-size 40px
+
 							line-height 1
+							@media mobile
+								font-size 11px
+							@media compu
+								font-size 40px
 						span
-							font-size 23px
-							letter-spacing -2px
+
 							text-transform uppercase
 							background-color white
 							color verde
 							padding 5px 20px
 							margin 5px 0
 							border-radius 50px
+							@media mobile
+								font-size 11px
+							@media compu
+								font-size 23px
+								letter-spacing -2px
 
 				.evento-container
 					margin 40px 0
@@ -134,6 +182,8 @@ main
 					.precio
 						margin 0 20px
 						color white
+						@media mobile
+							display none
 						strong
 							font-size 25px
 							text-align center
@@ -228,13 +278,25 @@ main
 					display flex
 					flex-direction column
 					justify-content center
+					@media mobile
+						height 300px
+					@media compu
+						height 200px
 					span
 						margin 10px 0
 						color white
+						@media mobile
+							font-size 14px
 		&.modalidades
-			height 300px
+			@media compu
+				height 300px
 			.modalidades-content
-				margin-top -200px
+				@media mobile
+					flex-direction column
+					height 500px
+					max-width 100%
+				@media compu
+					margin-top -200px
 				.modalidad
 					padding 10px
 					cursor pointer
@@ -259,13 +321,26 @@ main
 								height 20px
 								width auto
 						.titulo
-							font-size 25px
+
 							letter-spacing -1px
 							font-weight bold
 							color verde
+							@media mobile
+								font-size 20px
+							@media compu
+								font-size 25px
 					.descripcion
-						padding 20px
+
 						text-align justify
+						@media mobile
+							padding 10px
+						@media compu
+							padding 20px
+						p
+							@media mobile
+								font-size 11px
+							@media compu
+								font-size 25px
 
 		&.leadership, &.bilateral
 			height 80vh
@@ -274,12 +349,17 @@ main
 			.content
 				height 100%
 				display flex
+				@media mobile
+					flex-direction column
 				.imagen
 					flex 1
 					display flex
 					justify-content center
 					align-items center
 					background-repeat no-repeat
+					@media mobile
+						order 1
+						background-image none !important
 					.titulo
 						font-family Futura
 						font-weight 800
@@ -293,9 +373,14 @@ main
 					justify-content center
 					align-items center
 					flex-direction column
+					@media mobile
+						order 2
+						flex 4
 					.descripcion
 						max-width 70%
 						color white
+						@media mobile
+							font-size 14px
 					.md-button
 						background-color inherit
 						border 1px solid white
@@ -322,18 +407,34 @@ main
 			height 100vh
 			h2
 				font-family Futura
-				font-size 5vw
-				line-height 5vw
+
 				margin 0px
+				@media mobile
+					font-size 7vw
+					line-height 7.5vw
+				@media compu
+					font-size 4.5vw
+					line-height 5vw
 			h4
 				font-family Futura
-				font-size 3vw
-				line-height 3vw
 				color verde
 				margin 0px
+				@media mobile
+					font-size 4vw
+					line-height 4vw
+				@media compu
+					font-size 3vw
+					line-height 3vw
 			.formulario-content
+				@media mobile
+					max-width 95%
 				form
 					width 100%
+					&>div
+						@media mobile
+							flex-direction column
+							md-input-container
+								margin 0px
 					.md-button
 						background-color verde
 						border-radius 50px
@@ -350,12 +451,20 @@ main
 	margin-top 100px
 	.servicios-content
 		min-height 100vh
+		@media mobile
+			max-width 95%
 		.filtros
 			margin 30px 0
-			height 40px
+
 			display flex
 			justify-content space-around
-			flex-direction row
+
+			@media mobile
+				flex-direction column
+				height 200px
+			@media compu
+				flex-direction row
+				height 40px
 			.clear
 				margin 0px
 				background gris
@@ -372,26 +481,29 @@ main
 					nav
 						position relative
 						z-index 2
-					.md-nav-item
-						font-size 11px
-						margin 0px 10px
-						border-radius 0px
-						&:first-child
-							margin-left 0px
-							border-radius 50px 0 0 50px
-						&:last-child
-							border-radius 0 50px 50px 0
-							margin-right 0px
-						.md-button
-							margin 0px
-							border-radius 50px
-							padding 8px
-							span
-								font-size 11px
-								color white
-							&.md-unselected
+					._md-nav-bar-list
+						@media mobile
+							justify-content space-around
+						.md-nav-item
+							font-size 11px
+							margin 0px 10px
+							border-radius 0px
+							&:first-child
+								margin-left 0px
+								border-radius 50px 0 0 50px
+							&:last-child
+								border-radius 0 50px 50px 0
+								margin-right 0px
+							.md-button
+								margin 0px
+								border-radius 50px
+								padding 8px
 								span
+									font-size 11px
 									color white
+								&.md-unselected
+									span
+										color white
 
 					md-nav-ink-bar
 						height 100%
@@ -506,34 +618,47 @@ main
 			align-items center
 			&>div
 				padding 10vw
-		form
-			min-width 60%
-			md-input-container
-				margin 10px 0
-				.md-errors-spacer
-					min-height 0px
-				input
-					background-color white
-					height 45px
-					border-radius 5px
-			.md-button
-				background-color rgba(255,255, 255, 0.4)
-				margin 20px 0px
-				height 50px
+		.prospecto
+			@media mobile
+				display none
+			form
+				min-width 60%
+				md-input-container
+					margin 10px 0
+					.md-errors-spacer
+						min-height 0px
+					input
+						background-color white
+						height 45px
+						border-radius 5px
+				.md-button
+					background-color rgba(255,255, 255, 0.4)
+					margin 20px 0px
+					height 50px
 	.programa
 		min-height 60vh
 
 footer
+	@media mobile
+		height 100vh
 	margin-top 20px
 	background-color gris
 	.footer-content
-		margin 20px 0
+		@media compu
+			margin 20px 0
+		@media mobile
+			height 100vh
 		h4
 			color white
+			@media mobile
+				margin 0
 		.direccion
 			md-icon
-				margin 20px
 				color white
+				@media compu
+					margin 20px
+				@media mobile
+					margin 0 20px
 			p
 				color white
 		.mapa
@@ -542,10 +667,16 @@ footer
 				width 300px
 				.angular-google-map
 					width 100%
-					height 300px
-					.angular-google-map-container
+					@media compu
 						height 300px
+					@media mobile
+						height 200px
+					.angular-google-map-container
 						width 100%
+						@media compu
+							height 300px
+						@media mobile
+							height 200px
 
 .md-dialog-container
 	position absolute

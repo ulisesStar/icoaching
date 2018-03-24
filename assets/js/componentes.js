@@ -7,7 +7,7 @@ app.component('slider', {
     controller: function($scope, $element, $animate, Imagen) {
 
         var self = this
-        
+
         Imagen.servicio(this.id)
         .then(res => self.imagenes = res.data)
         .then(() => $scope.$digest())
@@ -22,6 +22,8 @@ app.component('slider', {
                         cssEase: 'linear',
                         arrow: true
                     })
+
+                    $scope.$digest()
                 }
 
         })

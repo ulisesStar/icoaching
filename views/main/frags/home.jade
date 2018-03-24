@@ -6,7 +6,7 @@
 					p llegar a la meta es
 					h3 MÁS FÁCIL CON ICOACH
 				.fecha-container
-					p Proximo curso
+					p Proximo evento
 					.proximo
 						.evento {{ctrl.evento.nombre}} de
 						.servicio {{ctrl.servicio.nombre}}
@@ -66,7 +66,7 @@
 				span Icoach nace por el interés de crear, forjar y formar nuevos líderes y empresarios que implementen nuevas estrategias y herramientas para establecer negocios sólidos y consolidados. 
 				span Icoach está conformado por especialistas en las distas áreas de consultoría como; coaching, programación neurolingüística, finanzas, recursos humanos, branding personal, marketing y comunicación.
 	section.modalidades(layout="row" layout-align="center center")
-		.modalidades-content(flex="80" layout="row" layout-align="space-around start")
+		.modalidades-content(flex="80" flex-sm="100" layout="row" layout-align="space-around start")
 			md-card.modalidad(ng-repeat="modalidad in ctrl.modalidades" flex ng-init="hover = false"  ng-mouseover="hover = true" ng-mouseleave="hover = false"  ng-class="hover ? 'conHover' : 'sinHover'" ui-sref="servicios({IdModalidad: modalidad.id})")
 				.titulo-container
 					.imagen(md-whiteframe="3")
@@ -95,7 +95,7 @@
 		.formulario-content(ng-if="ctrl.prospecto")
 			h2 Muchas gracias {{ctrl.prospecto.nombre}}
 		.formulario-content(flex="60" ng-if="!ctrl.prospecto")
-			h2 Solicita una sesión de coaching
+			h2 Solicita una sesión de coaching bilateral Reset
 			h4 Sin costo
 			form(layout="column" name="formulario" ng-submit="ctrl.crearProspecto(prospecto)" )
 				div(layout="row")
@@ -105,7 +105,7 @@
 					md-input-container(flex)
 						label Apellido
 						input(ng-model="prospecto.apellido" required)
-				div(layout="row")
+				div(layout="row" layout-sm="column")
 					md-input-container(flex)
 						label Compañia
 						input(ng-model="prospecto.empresa" required)
